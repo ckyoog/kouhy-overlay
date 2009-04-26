@@ -1,0 +1,135 @@
+diff -ru pcmanx-gtk2-svn-r464.bak/po/zh_CN.po pcmanx-gtk2-svn-r464/po/zh_CN.po
+--- pcmanx-gtk2-svn-r464.bak/po/zh_CN.po	2009-03-18 11:44:14.000000000 +0800
++++ pcmanx-gtk2-svn-r464/po/zh_CN.po	2009-03-18 16:09:15.000000000 +0800
+@@ -612,3 +612,13 @@
+ "pcmanx 与 libpcmanx-core 版本不匹配。\n"
+ "\n"
+ "请检查你的安装。"
++
++
++#: kouhy <ckyoog@gmail.com>
++#: ../src/view/telnetcon.cpp:313
++msgid "Username"
++msgstr "用戶名"
++
++#: ../src/view/telnetcon.cpp:313
++msgid "username"
++msgstr "用戶名"
+diff -ru pcmanx-gtk2-svn-r464.bak/po/zh_TW.po pcmanx-gtk2-svn-r464/po/zh_TW.po
+--- pcmanx-gtk2-svn-r464.bak/po/zh_TW.po	2009-03-18 11:44:14.000000000 +0800
++++ pcmanx-gtk2-svn-r464/po/zh_TW.po	2009-03-18 16:10:11.000000000 +0800
+@@ -610,3 +610,13 @@
+ "\n"
+ "Please check your installation."
+ msgstr ""
++
++
++#: kouhy <ckyoog@gmail.com>
++#: ../src/view/telnetcon.cpp:313
++msgid "Username"
++msgstr "帳號"
++
++#: ../src/view/telnetcon.cpp:313
++msgid "username"
++msgstr "帳號"
+diff -ru pcmanx-gtk2-svn-r464.bak/src/mainframe.cpp pcmanx-gtk2-svn-r464/src/mainframe.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/mainframe.cpp	2009-03-18 11:44:12.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/mainframe.cpp	2009-03-18 16:06:56.000000000 +0800
+@@ -611,12 +611,15 @@
+ 
+ void CMainFrame::OnNewCon(GtkMenuItem* mitem UNUSED, CMainFrame* _this)
+ {
++	int response; string text;
+ 	CInputDialog* dlg = new CInputDialog( _this, _("Connect"), _("Host IP Address:\nAppend port number to IP with a separating colon if it's not 23."), NULL, true );
+-	if( dlg->ShowModal() == GTK_RESPONSE_OK && !dlg->GetText().empty() )
++	response = dlg->ShowModal();
++	text = dlg->GetText();
++	dlg->Destroy();
++	if( response == GTK_RESPONSE_OK && !text.empty() )
+ 	{
+-		_this->NewCon( dlg->GetText(), dlg->GetText() );
++		_this->NewCon( text, text );
+ 	}
+-	dlg->Destroy();
+ }
+ 
+ void CMainFrame::OnQuit(GtkMenuItem* mitem UNUSED, CMainFrame* _this)
+diff -ru pcmanx-gtk2-svn-r464.bak/src/view/telnetcon.cpp pcmanx-gtk2-svn-r464/src/view/telnetcon.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/view/telnetcon.cpp	2009-03-18 11:44:10.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/view/telnetcon.cpp	2009-03-18 16:06:56.000000000 +0800
+@@ -28,6 +28,7 @@
+ 
+ #if !defined(MOZ_PLUGIN)
+ #include "mainframe.h"
++#include "inputdialog.h"
+ 
+ #ifdef USE_NOTIFIER
+ #ifdef USE_LIBNOTIFY
+@@ -295,6 +296,36 @@
+ 	/* external ssh */
+ 	else if ( m_Port == 22 && m_Site.m_UseExternalSSH )
+ 	{
++#if !defined(MOZ_PLUGIN)
++		// Prepare for username. Popup a dialog to request username.
++		// And store username to 
++		// kouhy <ckyoog@gmail.com>
++		int p, response;
++		string text, username, justaddress = address;
++
++		p = address.find('@');
++		if( p != string::npos )	{	// found
++			username = address.substr(0,p);
++			justaddress = address.substr(p+1);
++		}
++
++		CMainFrame* mainfrm = ((CTelnetView*)m_pView)->GetParentFrame();
++		CInputDialog* dlg = new CInputDialog( mainfrm, _("Username"), _("username"), username.c_str(), true );
++		response = dlg->ShowModal();
++		text = dlg->GetText();
++		dlg->Destroy();
++
++		if( response != GTK_RESPONSE_OK ) {
++			Close();
++			mainfrm->OnTelnetConClose((CTelnetView*)m_pView);
++			return false;
++		}
++		if( response == GTK_RESPONSE_OK && !text.empty() ) {
++			address = text + string("@") + justaddress;
++			m_Site.m_URL = address + string(":22");
++		}
++#endif
++
+ 		// Suggestion from kyl <kylinx@gmail.com>
+ 		// Call forkpty() to use pseudo terminal and run
+ 		// an external program.
+@@ -667,8 +698,8 @@
+ 	m_IdleTime = 0;
+ 	m_State = TS_CONNECTING;
+ 
+-	int p = m_Site.m_URL.find(':',true);
+-	if( p >=0 )		// use port other then 23;
++	int p = m_Site.m_URL.find(':');
++	if( p != string::npos )		// use port other then 23;
+ 	{
+ 		port = (unsigned short)atoi(m_Site.m_URL.c_str()+p+1);
+ 		address = m_Site.m_URL.substr(0, p);
+@@ -770,6 +801,8 @@
+ 
+ void CTelnetCon::Reconnect()
+ {
++	if ( m_State != TS_CLOSED )
++		return;
+ 	ClearScreen(2);
+ 	m_CaretPos.x = m_CaretPos.y = 0;
+ 	Connect();
+diff -ru pcmanx-gtk2-svn-r464.bak/src/view/telnetview.cpp pcmanx-gtk2-svn-r464/src/view/telnetview.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/view/telnetview.cpp	2009-03-18 11:44:10.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/view/telnetview.cpp	2009-03-18 16:06:56.000000000 +0800
+@@ -142,6 +142,7 @@
+ 	case GDK_Return:
+ 	case GDK_KP_Enter:
+ 		GetCon()->SendRawString("\r",1);
++		GetCon()->Reconnect();
+ 		break;
+ 	case GDK_Delete:
+ 	case GDK_KP_Delete:

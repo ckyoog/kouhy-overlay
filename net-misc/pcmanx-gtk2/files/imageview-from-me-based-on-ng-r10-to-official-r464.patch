@@ -1,0 +1,137 @@
+diff -ruN pcmanx-gtk2-svn-r464.imageview/data/Makefile.am pcmanx-gtk2-svn-r464/data/Makefile.am
+--- pcmanx-gtk2-svn-r464.imageview/data/Makefile.am	2009-03-18 11:44:14.000000000 +0800
++++ pcmanx-gtk2-svn-r464/data/Makefile.am	2009-03-19 10:56:04.000000000 +0800
+@@ -3,6 +3,12 @@
+ 	script/orz.py \
+ 	script/eliza.py \
+ 	script/PCManXlib.py
++else
++SCRIPT_FILES =
++endif
++
++if USE_IMAGEVIEW
++SCRIPT_FILES += script/downimage.sh
+ endif
+ 
+ if USE_NANCY
+diff -ruN pcmanx-gtk2-svn-r464.imageview/data/script/downimage.sh pcmanx-gtk2-svn-r464/data/script/downimage.sh
+--- pcmanx-gtk2-svn-r464.imageview/data/script/downimage.sh	1970-01-01 08:00:00.000000000 +0800
++++ pcmanx-gtk2-svn-r464/data/script/downimage.sh	2009-03-19 10:54:48.000000000 +0800
+@@ -0,0 +1,32 @@
++#!/bin/sh
++# Download image called by pcmanx-gtk2. Can also be called by hand.
++# Usage: downimage.sh url [outname]
++
++DOWNLOAD_TOOL=wget
++wget_opts="--content-disposition"
++
++[ $# = 0 -o -z "$1" ] && { echo "Invalid argument." >&2; exit 1; }
++
++[ $# = 2 ] && { echo $2; [ -f "$2" ] || $DOWNLOAD_TOOL "$1" -O "$2" >/dev/null; exit; }
++
++
++# downimage url
++downimage()
++{
++	echo "Downloading image..." >&2
++	# Download to dir .$prefix,
++	# in order to avoid override by each other
++	# when download from different url but imagename is the same.
++	$DOWNLOAD_TOOL "$1" $wget_opts -P .$prefix >&2 || return
++	local imagename=`ls .$prefix/`
++	mv .$prefix/$imagename ${prefix}_${imagename}
++	rm .$prefix/ -fr
++	readlink -e ${prefix}_${imagename}
++}
++
++url="$1"
++prefix=`echo $url | tr ':/?' _`
++
++mkdir -p $HOME/.pcmanx/pool
++cd $HOME/.pcmanx/pool && (readlink -e ${prefix}_* || downimage "$url")
++
+diff -ruN pcmanx-gtk2-svn-r464.imageview/src/appconfig.cpp pcmanx-gtk2-svn-r464/src/appconfig.cpp
+--- pcmanx-gtk2-svn-r464.imageview/src/appconfig.cpp	2009-03-19 10:36:05.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/appconfig.cpp	2009-03-19 10:47:39.000000000 +0800
+@@ -391,13 +391,13 @@
+ 
+ void CAppConfig::AfterLoad()
+ {
+-	if(	!WebBrowser.empty() && !strstr( WebBrowser.c_str(), " %s") )
+-		WebBrowser += " %s";
+-	if(	!MailClient.empty() && !strstr( MailClient.c_str(), " %s") )
+-		MailClient += " %s";
++	if( !WebBrowser.empty() && !strstr( WebBrowser.c_str(), " %s") && !strstr( WebBrowser.c_str(), " \"%s\"") )
++		WebBrowser += " \"%s\"";
++	if( !MailClient.empty() && !strstr( MailClient.c_str(), " %s") && !strstr( MailClient.c_str(), " \"%s\"") )
++		MailClient += " \"%s\"";
+ #ifdef USE_IMAGEVIEW
+-	if(	!ImageViewer.empty() && !strstr( ImageViewer.c_str(), " %s") )
+-		ImageViewer += " %s";
++	if( !ImageViewer.empty() && !strstr( ImageViewer.c_str(), " %s") && !strstr( ImageViewer.c_str(), " \"%s\"") )
++		ImageViewer += " \"%s\"";
+ #endif
+ 
+ /*	if( 0 == Shadow.length() )
+diff -ruN pcmanx-gtk2-svn-r464.imageview/src/view/telnetview.cpp pcmanx-gtk2-svn-r464/src/view/telnetview.cpp
+--- pcmanx-gtk2-svn-r464.imageview/src/view/telnetview.cpp	2009-03-19 10:36:05.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/view/telnetview.cpp	2009-03-19 10:37:36.000000000 +0800
+@@ -715,17 +715,37 @@
+ 	string url = value->substr(0,value->find("#"));
+ 	string app = value->substr(value->find("#") + 1, value->length());
+ 	char *tmp_img;
++	char cmd[1024];
++
++	int ret, len;
++	char imagename[1024] = {0};
++	sprintf(cmd, "/bin/sh " DATADIR "/pcmanx/script/downimage.sh %s", url.c_str());
++	FILE *cmd_output = popen(cmd, "r");
++	if (cmd_output == NULL) goto builtin_downimage;
++	fgets(imagename, 1023, cmd_output);
++	ret = pclose(cmd_output);
++	if (ret == -1 || !WIFEXITED(ret) || WEXITSTATUS(ret) != 0) goto builtin_downimage;
++	if ((len = strlen(imagename)) == 0) goto builtin_downimage;
++
++	tmp_img = imagename;
++	if (tmp_img[len - 1] == '\n') tmp_img[len - 1] = 0;
++	goto builtin_showimage;
++
++builtin_downimage:
+ 	char tmpname[L_tmpnam];
+ 	tmp_img = tmpnam(tmpname);
+-
+-	char cmd[200];
+ 	sprintf(cmd, "wget %s -O%s", url.c_str(), tmp_img);
+ 	system(cmd);
+-	char cmd1[100];
+ 
++builtin_showimage:
++	printf("** imagename=%s\n", tmp_img);
++	char cmd1[1024] = {0};
+ 	sprintf(cmd1, app.c_str(), tmp_img);
+ 	strcat(cmd1, " &");
+ 	system(cmd1);
++	printf("view over\n");
++
++	delete arg;
+ 	return;
+ }
+ #endif
+@@ -788,12 +808,12 @@
+ 	{
+ 
+ 		GThread *tid = NULL;
+-		string thread_arg = sURL;
+-		thread_arg.append("#");
+-		thread_arg.append(m_ImageViewer);
+-		printf("myurl=%s\n", thread_arg.c_str());
++		string *thread_arg = new string(sURL);
++		thread_arg->append("#");
++		thread_arg->append(m_ImageViewer);
++		printf("myurl=%s\n", thread_arg->c_str());
+ 		tid = g_thread_create((GThreadFunc) &thr_downimage,
+-		                      (gpointer *) &thread_arg,
++		                      (gpointer *) thread_arg,
+ 				      FALSE, NULL);
+ 		return;
+ 	}

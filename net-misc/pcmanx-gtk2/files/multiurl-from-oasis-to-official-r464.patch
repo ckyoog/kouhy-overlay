@@ -1,0 +1,304 @@
+diff -ru pcmanx-gtk2.bak/src/core/termdata.cpp pcmanx-gtk2/src/core/termdata.cpp
+--- pcmanx-gtk2.bak/src/core/termdata.cpp	2009-03-19 14:38:56.000000000 +0800
++++ pcmanx-gtk2/src/core/termdata.cpp	2009-03-19 18:55:36.000000000 +0800
+@@ -898,39 +898,59 @@
+ 
+ // 2004/08/06 added by PCMan
+ // This function is used to detect URLs other than E-mails and called from UpdateDisplay().
+-inline void DetectCommonURLs( const char *line, CTermCharAttr *attr, int len )
++inline void DetectCommonURLs( const char *line, CTermCharAttr *attr, int len ,CTermCharAttr *last)
+ {
+ 	int ilink = 0, stage = 0;
+ 	for( int col = 0; col < len; col += (CTermCharAttr::CS_ASCII==attr[col].GetCharSet()?1:2) )
+ 	{
+ 		unsigned char ch = line[col];
+-		switch( stage )
++		if(last!=NULL && last[len-1].IsHyperLink() && isurl(ch) && col==0) //last line maybe a not complete url
+ 		{
+-		case 0:	// a URL scheme character is found, beginning of URL.
+-			if( isurlscheme(ch) )
++			int i = 0;
++			while(isurl (ch))
+ 			{
+-				stage = 1;
+-				ilink = col;
++				attr[i].SetHyperLink(true);
++				attr[i].SetNeedUpdate(true);
++				i ++;
++				ch = line[i];
+ 			}
+-			break;
+-		case 1:	// "://" is found.
+-			if( 0 == strncmp( line+col, "://", 3 ) && isurl( line[col+3] ) )
+-			{
+-				stage = 2;
+-				col += 3;
+-			}
+-			else if( !isurlscheme(ch) )
+-				stage = 0;
+-			break;
+-		case 2:	// This is a valid URL.
+-			if( !isurl(ch) )
++			col+= i;
++		}
++		else
++		{
++			switch( stage )
+ 			{
+-				for( ; ilink < col; ilink++ )
++			case 0:	// a URL scheme character is found, beginning of URL.
++				if( isurlscheme(ch) )
+ 				{
+-					attr[ilink].SetHyperLink(true);
+-					attr[ilink].SetNeedUpdate(true);
++					stage = 1;
++					ilink = col;
+ 				}
+-				stage = 0;
++				break;
++			case 1:	// "://" is found.
++				if( 0 == strncmp( line+col, "://", 3 ) && isurl( line[col+3] ) )
++				{
++					stage = 2;
++					col += 3;
++				}
++				else if( !isurlscheme(ch) )
++					stage = 0;
++				break;
++			case 2:	// This is a valid URL.
++				if( !isurl(ch) || col == len-1)
++                {
++            		for( ; ilink <col; ilink++ )
++                    {
++                         attr[ilink].SetHyperLink(true);
++                         attr[ilink].SetNeedUpdate(true);
++                    }
++                    if(col == len -1)
++                    {
++                         attr[col].SetHyperLink(true);
++                         attr[col].SetNeedUpdate(true);
++                    }
++                    stage = 0;
++                }
+ 			}
+ 		}
+ 	}
+@@ -942,6 +962,7 @@
+ {
+ 	int iline = m_FirstLine;
+ 	int ilast_line = iline + m_RowsPerPage;
++	CTermCharAttr* last_attr = NULL;
+ 	for( ; iline < ilast_line; iline++ )
+ 	{
+ 		char* line = m_Screen[iline];
+@@ -950,7 +971,8 @@
+ 		for( int col = 0; col < m_ColsPerPage; col ++ )
+ 			attr[col].SetHyperLink(false);
+ 		DetectEMails( line, attr, m_ColsPerPage );	// Search for E-mails.
+-		DetectCommonURLs( line, attr, m_ColsPerPage );	// Search for URLs other than E-mail.
++		DetectCommonURLs( line, attr, m_ColsPerPage,last_attr);	// Search for URLs other than E-mail.
++		last_attr = GetLineAttr( line );
+ 	}
+ }
+ 
+@@ -1201,8 +1223,8 @@
+ // If line[col] is a character in a hyperlink, return the start index of whole hyperlink, 
+ // and store its length in 'len' which is optional and can be NULL.
+ // If there is no hyperlink found at specified index 'col', the return value will be -1.
+-int CTermData::HyperLinkHitTest(const char *line, int col, int *len/*= NULL*/ )
+-{
++//int CTermData::HyperLinkHitTest(const char *line, int col, int *len/*= NULL*/ )
++/*{
+ 	CTermCharAttr* pattr = GetLineAttr( line );
+ 	if( !pattr[col].IsHyperLink() )
+ 		return -1;
+@@ -1216,7 +1238,7 @@
+ 		*len = col-start;
+ 	}
+ 	return start;
+-}
++}*/
+ 
+ // 2004/08/12	Modified by PCMan
+ // Delete n characters at specified position (line, col).
+diff -ru pcmanx-gtk2.bak/src/core/termdata.h pcmanx-gtk2/src/core/termdata.h
+--- pcmanx-gtk2.bak/src/core/termdata.h	2009-03-19 14:38:56.000000000 +0800
++++ pcmanx-gtk2/src/core/termdata.h	2009-03-19 18:55:36.000000000 +0800
+@@ -190,7 +190,7 @@
+ 	void InsertChar( int line, int col, int n );
+ 	// Delete n characters at specified position (line, col).
+ 	void DeleteChar( int line, int col , int n = 1 );
+-	int HyperLinkHitTest( const char* line, int col, int* len = NULL );
++	//int HyperLinkHitTest( const char* line, int col, int* len = NULL );
+ 
+ 	unsigned char GetCharClass( int line, int col );
+ 
+diff -ru pcmanx-gtk2.bak/src/core/termview.cpp pcmanx-gtk2/src/core/termview.cpp
+--- pcmanx-gtk2.bak/src/core/termview.cpp	2009-03-19 14:38:56.000000000 +0800
++++ pcmanx-gtk2/src/core/termview.cpp	2009-03-19 18:55:36.000000000 +0800
+@@ -757,11 +757,29 @@
+ 		int y = (int)evt->y;
+ 		PointToLineCol( &x, &y );
+ 
+-		int start, end;
+-		if( HyperLinkHitTest( x, y, &start, &end ) )
++		int start, end,begin_line,end_line;
++		if( HyperLinkHitTest( x, y, &start, &end ,&begin_line,&end_line) )
+ 		{
+-			char* pline = m_pTermData->m_Screen[y];
+-			OnHyperlinkClicked( string( (pline+start), (int)(end-start) ) );
++			if(begin_line<end_line)
++			{
++				char* bline = m_pTermData->m_Screen[begin_line];
++				int p = begin_line+1;
++				string url = string( (bline+start), m_pTermData->m_ColsPerPage);
++				while(p<end_line)
++				{
++					bline = m_pTermData->m_Screen[p];
++					url.append(string(bline, m_pTermData->m_ColsPerPage));
++					p++;
++				}
++				bline = m_pTermData->m_Screen[end_line];
++				url.append(bline,end);
++				OnHyperlinkClicked(url);
++			}
++			else
++			{
++				char* pline = m_pTermData->m_Screen[y];
++				OnHyperlinkClicked( string( (pline+start), (int)(end-start) ) );
++			}
+ 		}
+ 	}
+ 	else	// if there is a selected area
+@@ -1033,24 +1051,48 @@
+ 	gtk_im_context_set_cursor_location(m_IMContext, &rc);
+ }
+ 
+-
+-bool CTermView::HyperLinkHitTest(int x, int y, int* start, int* end)
++//modified by oasis to enable multiline url detect
++bool CTermView::HyperLinkHitTest(int x, int y, int* start, int* end,int* begin_line,int* end_line)
+ {
+ 	char* pline = m_pTermData->m_Screen[y];
+ 	CTermCharAttr* pattr = m_pTermData->GetLineAttr(pline);
++	*begin_line = y;
++	*end_line = y;
+ 	if( x > 0 && x < m_pTermData->m_ColsPerPage && pattr[x].IsHyperLink() )
+ 	{
+ 		int _start, _end;
+-		for( _start = (x - 1); _start > 0 &&
+-		                       pattr[_start].IsHyperLink(); _start-- )
+-			;
+-		if( !pattr[_start].IsHyperLink() )
++		for( _start = (x - 1); _start > 0 && pattr[_start].IsHyperLink(); _start-- );
++		CTermCharAttr* nattr;
++        while(_start == 0&&strncmp(pline,"http",4)&&*begin_line>0) //this is the mid_line url,should loop back to find the actual start 
++        {
++             *begin_line=*begin_line - 1;
++             pline = m_pTermData->m_Screen[*begin_line];
++             nattr = m_pTermData->GetLineAttr(pline);
++             for( _start = m_pTermData->m_ColsPerPage-1; _start >= 0 && nattr[_start].IsHyperLink(); _start-- );
++        }
++		if(_start!=0)
+ 			_start++;
+-		for( _end = (x + 1); _end < m_pTermData->m_ColsPerPage &&
+-		                     pattr[_end].IsHyperLink(); _end++ )
+-			;
++		for( _end = (x + 1); _end < m_pTermData->m_ColsPerPage && pattr[_end].IsHyperLink(); _end++ );
++		while(_end == m_pTermData->m_ColsPerPage) //maybe url is not complete
++        {
++             *end_line = *end_line+1;
++             char* next_line=m_pTermData->m_Screen[*end_line];
++             nattr = m_pTermData->GetLineAttr(next_line);
++             if(nattr[0].IsHyperLink())
++             {
++                  int _next_end;
++                  for( _next_end = 0; _next_end < m_pTermData->m_ColsPerPage && nattr[_next_end].IsHyperLink(); _next_end++ );
++                  _end = _next_end;
++             }
++			else
++			{
++				*end_line--;
++				break;
++			}
++        }
+ 		*start = _start;
+ 		*end = _end;
++		
+ 		INFO("%d, %d : %d, %d", x, y, _start, _end);
+ 		return true;
+ 	}
+Only in pcmanx-gtk2/src/core: termview.cpp.orig
+diff -ru pcmanx-gtk2.bak/src/core/termview.h pcmanx-gtk2/src/core/termview.h
+--- pcmanx-gtk2.bak/src/core/termview.h	2009-03-19 14:38:56.000000000 +0800
++++ pcmanx-gtk2/src/core/termview.h	2009-03-19 18:55:36.000000000 +0800
+@@ -88,7 +88,7 @@
+     void OnKillFocus(GdkEventFocus *evt);
+ 	static void OnBeforeDestroy( GtkWidget* widget, CTermView* _this);
+     void UpdateCaretPos();
+-    bool HyperLinkHitTest(int x, int y, int* start, int* end);
++    bool HyperLinkHitTest(int x, int y, int* start, int* end,int* begin_line,int* end_line);
+     void OnDestroy();
+     void RecalcCharDimension();
+     void GetCellSize( int &w, int &h );
+diff -ru pcmanx-gtk2.bak/src/view/telnetview.cpp pcmanx-gtk2/src/view/telnetview.cpp
+--- pcmanx-gtk2.bak/src/view/telnetview.cpp	2009-03-19 14:38:59.000000000 +0800
++++ pcmanx-gtk2/src/view/telnetview.cpp	2009-03-19 18:55:36.000000000 +0800
+@@ -420,9 +420,9 @@
+ 	bool left;
+ 	this->PointToLineCol( &x, &y, &left );
+ 
+-  int start, end;
++  int start, end,begin_line,end_line;
+   // Don't send mouse action when the user click on hyperlinks
+-  if( HyperLinkHitTest( x, y, &start, &end ) )
++  if( HyperLinkHitTest( x, y, &start, &end,&begin_line,&end_line ) )
+ 		  return;
+ 
+ 	//some text is selected
+@@ -504,10 +504,32 @@
+ 		int x = (int)evt->x;
+ 		int y = (int)evt->y;
+ 		PointToLineCol( &x, &y );
+-		int start, end;
+-		if( HyperLinkHitTest( x, y, &start, &end ) )
++		int start, end,begin_line,end_line;
++		if( HyperLinkHitTest( x, y, &start, &end,&begin_line,&end_line ) )
+ 		{
+-			char* pline = m_pTermData->m_Screen[y];
++			string url;
++			if(begin_line<end_line)
++			{
++				char* bline = m_pTermData->m_Screen[begin_line];
++				int p = begin_line+1;
++				url = string( (bline+start), m_pTermData->m_ColsPerPage);
++				while(p<end_line)
++				{
++					bline = m_pTermData->m_Screen[p];
++					url.append(string(bline, m_pTermData->m_ColsPerPage));
++					p++;
++				}
++				bline = m_pTermData->m_Screen[end_line];
++				url.append(bline,end);
++//				OnHyperlinkClicked(url);
++			}
++			else
++			{
++				char* pline = m_pTermData->m_Screen[y];
++				url= string( (pline+start), (int)(end-start) );
++			}
++			
++		//	char* pline = m_pTermData->m_Screen[y];
+ 			bool do_copy = false;
+ 			// Show the "Copy Hyperlink" menu.
+ 			GtkWidget* popup = gtk_menu_new();
+@@ -530,7 +552,7 @@
+ 				// Theoratically, there is no non-ASCII characters in standard URL,
+ 				// so we don't need to do UTF-8 conversion at all.
+ 				// However, users are always right.
+-				string url( (pline+start), (int)(end-start) );
++//				string url( (pline+start), (int)(end-start) );
+ 				gsize wl = 0;
+ 				const gchar* purl = g_convert_with_fallback( url.c_str(), url.length(),
+ 						"utf-8", m_pTermData->m_Encoding.c_str(), (gchar *) "?", NULL, &wl, NULL);
+Only in pcmanx-gtk2/src/view: telnetview.cpp.orig
