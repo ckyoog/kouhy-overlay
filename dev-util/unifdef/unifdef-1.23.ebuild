@@ -25,6 +25,7 @@ src_unpack() {
 	cd ${S}/src
 	epatch ${FILESDIR}/compatible.patch
 	epatch ${FILESDIR}/support-cpp-option.patch
+	epatch ${FILESDIR}/man.patch
 }
 
 src_install() {

@@ -1,0 +1,12 @@
+--- unifdef.1	2009-05-19 15:16:12.000000000 +0800
++++ unifdef.1.new	2009-06-29 18:03:40.000000000 +0800
+@@ -50,8 +50,7 @@
+ .Ar ...
+ .Op Ar file
+ .Nm unifdefall
+-.Op Fl I Ns Ar path
+-.Ar ...
++.Op Ic cpp-opts Ar -- Op Ic unifdef-opts
+ .Ar file
+ .Sh DESCRIPTION
+ The
