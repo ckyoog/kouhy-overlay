@@ -2,8 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-util/unifdef/unifdef-1.23.ebuild,v 1.1 2009/05/19 07:17:53 vapier Exp $
 
+inherit eutils
+
 DESCRIPTION="remove #ifdef'ed lines from a file while otherwise leaving the file alone"
-HOMEPAGE="http://freshmeat.net/projects/unifdef/"
+HOMEPAGE="http://freshmeat.net/projects/unifdef/
+		  http://www.freebsd.org/cgi/cvsweb.cgi/src/usr.bin/unifdef/"
 SRC_URI="mirror://gentoo/${P}.tar.lzma"
 
 LICENSE="BSD"
@@ -17,9 +20,18 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 	sed -i 's:\<getline\>:get_line:' */unifdef.c || die #270369
+
+	# extend unifdefall.sh by kouhy
+	cd ${S}/src
+	epatch ${FILESDIR}/compatible.patch
+	epatch ${FILESDIR}/support-cpp-option.patch
 }
 
 src_install() {
 	emake install DESTDIR="${D}" || die
 	dodoc ../README.Gentoo README
+
+	# install unifdefall.sh by kouhy
+	exeinto /usr/bin
+	doexe ${S}/src/unifdefall.sh
 }
