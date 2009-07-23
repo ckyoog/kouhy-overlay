@@ -1,32 +1,31 @@
 --- unifdefall.sh.1	2009-06-29 01:43:05.000000000 +0800
 +++ unifdefall.sh	2009-06-29 01:39:57.000000000 +0800
-@@ -5,12 +5,38 @@
+@@ -5,12 +5,37 @@
  #	$dotat: things/unifdefall.sh,v 1.9 2002/09/24 19:43:57 fanf2 Exp $
  # $FreeBSD: src/usr.bin/unifdef/unifdefall.sh,v 1.2 2002/09/24 19:50:03 fanf Exp $
 
 +# kouhy:
-+# Add support so that this script can pass options to cpp and unifdef respectively.
-+# Usage: unifdefall.sh [ cpp-opts -- [ unifdef-opts ] ] file
++# Changed for supporting cpp options, so now the script can pass options
++# to cpp and unifdef respectively.
++# Usage: unifdefall.sh [ cpp-opts ] [ -- unifdef-opts ] file
 +# -- preceded by cpp options, followed by unifdef options.
 +
-+if [ $# = 1 ]; then
-+	file=$1
-+	shift
-+fi
++eval file='${'$#'}'	# The last argument is always filename.
 +
-+while arg=$1; i=$#; shift; do
-+	[ $i = 0 ] && break;
++while arg=$1; t=$#; shift; do
++	[ $t = 1 ] && break;
 +	if [ $arg = -- ]; then
-+		seperator=--
++		has_seperator=1
 +		continue
 +	fi
-+	if [ "$seperator" = -- ]; then
-+		[[ $arg == -* ]] && unifdef_opts="$unifdef_opts $arg" ||
-+			file=$arg
++	if [ "$has_seperator" = 1 ]; then
++		followed_opts="$followed_opts $arg"
 +	else
-+		cpp_opts="$cpp_opts $arg"
++		preceded_opts="$preceded_opts $arg"
 +	fi
 +done
++cpp_opts=$preceded_opts
++unifdef_opts=$followed_opts
 +
  set -e
  
