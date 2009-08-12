@@ -1,0 +1,31 @@
+--- unifdefall.sh	2009-07-23 16:13:41.000000000 +0800
++++ unifdefall.sh.new	2009-08-12 18:30:09.020088788 +0800
+@@ -42,6 +42,28 @@
+ comm -23 $tmp/ctrl $tmp/alldef > $tmp/undef
+ comm -12 $tmp/ctrl $tmp/alldef > $tmp/def
+ 
++# kouhy:
++# Remove some macros in file `def' which should not be considered as defined
++# but add these macros into file `undef'.
++# E.g. command is `unifdefall.sh processed_file'
++# If in processed_file (not file included by processed_file) there is code
++# as following,
++#	#ifndef _HEAD_H_		#ifndef foo
++#	#define _HEAD_H_	or	#define foo() bar()
++#	#endif				#endif
++# the macro `_HEAD_H_' and `foo' is treated as defined by `cpp', but actually
++# it shouldn't have been.
++mv $tmp/def $tmp/def.old
++echo > $tmp/def
++while read sym; do
++	cpp -D"$sym=0+-*/(){}$sym" -dM -undef "$@" 2>&1 >/dev/null |
++		grep -q 'warning: "'"$sym"'" redefined$' &&
++			echo "$sym" >> $tmp/def ||
++			(echo "$sym" >> $tmp/undef
++			echo "fix: $sym" should not be considered as defined
++			) >&2
++done < $tmp/def.old
++
+ echo unifdef -k \\ > $tmp/cmd
+ sed -re 's/^(.*)$/-U\1 \\/' $tmp/undef >> $tmp/cmd
+ while read sym

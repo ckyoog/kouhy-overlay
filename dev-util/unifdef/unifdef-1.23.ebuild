@@ -26,6 +26,7 @@ src_unpack() {
 	epatch ${FILESDIR}/compatible.patch
 	epatch ${FILESDIR}/support-cpp-option.patch
 	epatch ${FILESDIR}/man.patch
+	epatch ${FILESDIR}/fix-wrong-defined-bug.patch
 }
 
 src_install() {
