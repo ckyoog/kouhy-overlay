@@ -1,0 +1,29 @@
+diff -ru libfprint-9999/examples/Makefile.am libfprint-9999.new/examples/Makefile.am
+--- libfprint-9999/examples/Makefile.am	2009-08-26 12:36:17.000000000 +0800
++++ libfprint-9999.new/examples/Makefile.am	2009-08-26 12:42:34.000000000 +0800
+@@ -1,5 +1,5 @@
+ INCLUDES = -I$(top_srcdir)
+-noinst_PROGRAMS = verify_live enroll verify img_capture
++bin_PROGRAMS = verify_live enroll verify img_capture
+ 
+ verify_live_SOURCES = verify_live.c
+ verify_live_LDADD = ../libfprint/libfprint.la -lfprint
+@@ -14,7 +14,7 @@
+ img_capture_LDADD = ../libfprint/libfprint.la -lfprint
+ 
+ if BUILD_X11_EXAMPLES
+-noinst_PROGRAMS += img_capture_continuous
++bin_PROGRAMS += img_capture_continuous
+ 
+ img_capture_continuous_CFLAGS = $(X_CFLAGS) $(XV_CFLAGS)
+ img_capture_continuous_SOURCES = img_capture_continuous.c
+diff -ru libfprint-9999/libfprint/Makefile.am libfprint-9999.new/libfprint/Makefile.am
+--- libfprint-9999/libfprint/Makefile.am	2009-08-26 12:36:17.000000000 +0800
++++ libfprint-9999.new/libfprint/Makefile.am	2009-08-26 12:42:48.000000000 +0800
+@@ -1,5 +1,5 @@
+ lib_LTLIBRARIES = libfprint.la
+-noinst_PROGRAMS = fprint-list-hal-info
++bin_PROGRAMS = fprint-list-hal-info
+ MOSTLYCLEANFILES = $(hal_fdi_DATA)
+ 
+ UPEKTS_SRC = drivers/upekts.c
