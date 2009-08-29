@@ -1,0 +1,20 @@
+--- gmailfs.py	2009-08-29 19:17:56.000000000 +0800
++++ gmailfs.py.new	2009-08-29 19:17:28.000000000 +0800
+@@ -89,11 +89,16 @@
+     global References
+     global DefaultUsername, DefaultPassword, DefaultFsname
+     global NumberQueryRetries
++    fname = abspath(expanduser(fname))	# added by kouhy
+     try:
+-      cp.read(fname)
++      ret = cp.read(fname)		# modified by kouhy
+     except:
+       log.warning("Unable to read configuration file: " + fname)
+       return
++    # added by kouhy
++    if fname not in ret:
++      log.warning("Unable to read configuration file: " + fname)
++      return
+ 
+     sections = cp.sections()
+     if "account" in sections:

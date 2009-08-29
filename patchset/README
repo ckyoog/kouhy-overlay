@@ -1,0 +1,4 @@
+This directory contains patchs I make. They are just for record no need to be placed in related ebuild. 
+
+fuse.py.patch		/usr/lib/pythonX.X/site-packages/fuse.py		sys-fs/fuse-python-0.1-r1 [zugaina]
+gmailfs.py.patch	/usr/bin/gmailfs.py					sys-fs/gmailfs-0.7.2-r1 [zugaina]

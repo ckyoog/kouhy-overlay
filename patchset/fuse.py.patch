@@ -1,0 +1,36 @@
+--- fuse.py	2009-08-29 19:18:40.000000000 +0800
++++ fuse.py.new	2009-08-29 19:17:38.000000000 +0800
+@@ -68,14 +68,19 @@
+         self.mountpoint = None
+     
+         # grab arguments, if any
++	"""
+         argv = sys.argv
+         argc = len(argv)
+-        if argc > 1:
++	"""
++	# modified by kouhy
++        argv = args
++        argc = len(argv)
++        if argc > 0:			# modified by kouhy
+             # we've been given the mountpoint
+-            self.mountpoint = argv[1]
+-        if argc > 2:
++            self.mountpoint = argv[0]	# modified by kouhy
++        if argc > 1:			# modified by kouhy
+             # we've received mount args
+-            optstr = argv[2]
++            optstr = argv[1]		# modified by kouhy
+             opts = optstr.split(",")
+             for o in opts:
+                 try:
+@@ -83,6 +88,9 @@
+                     self.optdict[k] = v
+                 except:
+                     self.optlist.append(o)
++        # added kouhy
++        else:
++	    self.optdict = kw
+ 
+     def GetContext(self):
+ 	return FuseGetContext(self)
