@@ -2,6 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
+# Current this ebuild is actually for svn rev 483.
+
 inherit eutils subversion flag-o-matic autotools multilib
 
 DESCRIPTION="PCMan is an easy-to-use telnet(ssh) client mainly targets BBS users formerly writen by gtk2, with patches from ng and myself(kouhy)."
@@ -34,11 +36,13 @@ src_unpack()
 	subversion_src_unpack
 
 	cd ${S}
-	local PATCH_R464="-to-official-r464"
+	local PATCH_R464="-to-official-r464" PATCH_R483="-to-official-r483"
+	# The patch for rev464 works with rev483 as well. Good!
 	epatch ${FILESDIR}/imageview-from-ng-r10${PATCH_R464}.patch
 	epatch ${FILESDIR}/imageview-from-me-based-on-ng-r10${PATCH_R464}.patch
 	epatch ${FILESDIR}/multiurl-from-oasis${PATCH_R464}.patch
 	epatch ${FILESDIR}/ssh-username-from-me${PATCH_R464}.patch
+	epatch ${FILESDIR}/xulrunner-1.9.1.3-interface-from-me${PATCH_R483}.patch
 
 	#eautoreconf
 	./autogen.sh

@@ -1,0 +1,60 @@
+diff -ur pcmanx-gtk2-9999/plugin/src/npn_gate.cpp pcmanx-gtk2-9999.new/plugin/src/npn_gate.cpp
+--- pcmanx-gtk2-9999/plugin/src/npn_gate.cpp	2009-09-30 17:32:40.000000000 +0800
++++ pcmanx-gtk2-9999.new/plugin/src/npn_gate.cpp	2009-09-30 17:31:08.000000000 +0800
+@@ -43,6 +43,27 @@
+ #include "npplat.h"
+ 
+ extern NPNetscapeFuncs NPNFuncs;
++#define CallNPN_GetURLNotifyProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_GetURLProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_PostURLNotifyProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_PostURLProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_RequestReadProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_NewStreamProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_WriteProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_DestroyStreamProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_StatusProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_UserAgentProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_MemAllocProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_MemFreeProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_MemFlushProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_ReloadPluginsProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_GetJavaEnvProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_GetJavaPeerProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_GetValueProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_SetValueProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_InvalidateRectProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_InvalidateRegionProc(func, ...) func(__VA_ARGS__)
++#define CallNPN_ForceRedrawProc(func, ...) func(__VA_ARGS__)
+ 
+ void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int* netscape_minor)
+ {
+@@ -175,14 +196,14 @@
+ JRIEnv* NPN_GetJavaEnv(void)
+ {
+   JRIEnv * rv = NULL;
+-	rv = CallNPN_GetJavaEnvProc(NPNFuncs.getJavaEnv);
++	rv = (JRIEnv *)CallNPN_GetJavaEnvProc(NPNFuncs.getJavaEnv);
+   return rv;
+ }
+ 
+ jref NPN_GetJavaPeer(NPP instance)
+ {
+   jref rv;
+-  rv = CallNPN_GetJavaPeerProc(NPNFuncs.getJavaPeer, instance);
++  rv = (jref)CallNPN_GetJavaPeerProc(NPNFuncs.getJavaPeer, instance);
+   return rv;
+ }
+ #endif
+diff -ur pcmanx-gtk2-9999/plugin/src/npplat.h pcmanx-gtk2-9999.new/plugin/src/npplat.h
+--- pcmanx-gtk2-9999/plugin/src/npplat.h	2009-09-30 17:32:40.000000000 +0800
++++ pcmanx-gtk2-9999.new/plugin/src/npplat.h	2009-09-30 17:25:38.000000000 +0800
+@@ -39,7 +39,7 @@
+ #define _NPPLAT_H_
+ 
+ #include "npapi.h"
+-#include "npupp.h"
++#include "npfunctions.h"
+ 
+ /**************************************************/
+ /*                                                */
