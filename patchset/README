@@ -2,3 +2,4 @@ This directory contains patchs I make. They are just for record no need to be pl
 
 fuse.py.patch		/usr/lib/pythonX.X/site-packages/fuse.py		sys-fs/fuse-python-0.1-r1 [zugaina]
 gmailfs.py.patch	/usr/bin/gmailfs.py					sys-fs/gmailfs-0.7.2-r1 [zugaina]
+openvanilla-modules-0.8.0.12-new-g++.patch	for compiling openvanilla-modules-0.8.0.12
