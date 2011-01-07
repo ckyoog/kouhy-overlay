@@ -11,8 +11,10 @@ SRC_URI="http://cthulhu.c3d2.de/~toidinamai/vlock/archive/${P}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="alpha amd64 ia64 ~mips ppc ppc64 sparc x86"
-IUSE="pam test +plugins +plugin_caca +plugin_mplayer +plugin_hibernate
-+plugin_alsa +plugin_thinkpad plugin_powerbook"
+#IUSE="pam test +plugins +plugin_caca +plugin_mplayer +plugin_hibernate
+#+plugin_alsa +plugin_thinkpad plugin_powerbook"
+IUSE="pam test plugins plugin_caca plugin_mplayer plugin_hibernate
+plugin_alsa plugin_thinkpad plugin_powerbook"
 
 DEPEND="
 	pam? ( sys-libs/pam )
