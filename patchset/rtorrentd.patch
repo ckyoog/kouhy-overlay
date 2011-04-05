@@ -1,0 +1,39 @@
+--- ./rtorrentd	2009-09-13 02:18:04.000000000 +0800
++++ ./rtorrentd.new	2009-09-11 12:34:14.000000000 +0800
+@@ -8,6 +8,36 @@
+ 	after slapd mysqld postgresql
+ }
+ 
++# Modified by kouhy(myself).
++# Added an extra option: --startas SCREEN
++# Why do this?
++# Because when screen is running, its process name is /usr/bin/SCREEN, not /usr/bin/screen.
++# If you cat /proc/`screen pid`/cmdline, you will find this:
++#    /usr/bin/SCREEN-dmSrtorrentd/usr/bin/rtorrent
++# This will cause `/etc/init.d/rtorrentd status` reports rtorrentd is crashed, however, it
++# has started in fact.
++# Why does `/etc/init.d/rtorrentd status` report rtorrentd is crashed?
++# cat /lib/rc/init.d/daemons/rtorrentd/001, you will see this:
++#    exec=/usr/bin/screen
++#    argv_0=/usr/bin/screen
++#    argv_1=-dmS
++#    argv_2=rtorrentd
++#    argv_3=/usr/bin/rtorrent
++#    pidfile=
++# openrc would compare the combination of argv_0 to argv_3 with result of "cat /proc/`screen pid`/cmdline".
++# So you can find out they are not identical.
++# That is why I added an extra option '--startas SCREEN'. Restart /etc/init.d/rtorrentd after this option
++# was added, you would see argv_0=SCREEN in /lib/rc/init.d/daemons/rtorrentd/001 and the result of "cat 
++# /proc/`screen pid`/cmdline" is like this:
++#    SCREEN-dmSrtorrentd/usr/bin/rtorrent
++# They are the same as we expect.
++#
++# But why didn't I add '--startas /usr/bin/SCREEN'. That did not work and I didn't know why.
++# If I did so, argv_0 changed into /usr/bin/SCREEN indeed, but cat /proc/`screen pid`/cmdline, you would see
++#    Susr/bin/SCREEN-dmSrtorrentd/usr/bin/rtorrent
++# I had no idea why the 1st character is a 'S', it should have been a '/'.  :(
++
++
+ start() {
+ 	PWHOME="$(getent passwd $USER | awk -F: '{ print $6 }')"
+ 

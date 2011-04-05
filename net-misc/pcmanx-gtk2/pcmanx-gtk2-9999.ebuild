@@ -15,7 +15,7 @@ RESTRICT="nomirror"
 KEYWORDS="x86 ~ppc amd64"
 SLOT="0"
 LICENSE="GPL-2"
-IUSE="+firefox +socks5 +libnotify -debug +nls mmx +mouse +external +iplookup +imageview"
+IUSE="firefox socks5 libnotify debug nls mmx mouse external iplookup imageview"
 
 DEPEND=">=x11-libs/gtk+-2.4
 	x11-libs/libXft
@@ -43,6 +43,8 @@ src_unpack()
 	epatch ${FILESDIR}/multiurl-from-oasis${PATCH_R464}.patch
 	epatch ${FILESDIR}/ssh-username-from-me${PATCH_R464}.patch
 	epatch ${FILESDIR}/xulrunner-1.9.1.3-interface-from-me${PATCH_R483}.patch
+
+	epatch ${FILESDIR}/gcc-4.5-from-me.patch
 
 	#eautoreconf
 	./autogen.sh

@@ -1,0 +1,11 @@
+--- pprinter.py.old	2011-04-05 15:37:14.000000000 +0800
++++ pprinter.py	2011-04-05 15:37:23.000000000 +0800
+@@ -115,7 +115,7 @@
+ 
+ def useflag(string, enabled=True):
+ 	"""Returns a USE flag string."""
+-	return output.blue(string) if enabled else output.red(string)
++	return output.blue(string) if not enabled else output.red(string)
+ 
+ def keyword(string, stable=True, hard_masked=False):
+ 	"""Returns a keyword string."""

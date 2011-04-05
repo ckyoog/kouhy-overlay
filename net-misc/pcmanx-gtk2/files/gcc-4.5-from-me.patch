@@ -1,0 +1,11 @@
+diff -ru pcmanx-gtk2-9999/src/appconfig.cpp pcmanx-gtk2-9999.new//src/appconfig.cpp
+--- pcmanx-gtk2-9999/src/appconfig.cpp	2011-02-03 17:58:34.000000000 +0800
++++ pcmanx-gtk2-9999.new//src/appconfig.cpp	2011-02-03 17:52:52.000000000 +0800
+@@ -20,6 +20,7 @@
+ 
+ #ifdef __GNUG__
+   #pragma implementation "appconfig.h"
++  #pragma implementation "site.h"
+ #endif
+ 
+ #include "appconfig.h"
