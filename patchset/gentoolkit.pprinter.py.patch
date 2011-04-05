@@ -1,4 +1,4 @@
---- pprinter.py.old	2011-04-05 15:37:14.000000000 +0800
+--- /usr/lib/python2.7/site-packages/gentoolkit/pprinter.py	2010-11-17 15:34:38.000000000 +0800
 +++ pprinter.py	2011-04-05 15:37:23.000000000 +0800
 @@ -115,7 +115,7 @@
  
