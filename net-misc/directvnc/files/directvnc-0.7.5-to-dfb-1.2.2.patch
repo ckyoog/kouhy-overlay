@@ -1,0 +1,12 @@
+diff -ru directvnc-0.7.5.orig/src/dfb.c directvnc-0.7.5/src/dfb.c
+--- directvnc-0.7.5.orig/src/dfb.c	2008-08-18 18:02:42.000000000 +0800
++++ directvnc-0.7.5/src/dfb.c	2008-08-18 18:01:13.000000000 +0800
+@@ -41,7 +41,7 @@
+ dfb_init(int argc, char *argv[])
+ {
+      DFBCHECK(DirectFBInit( &argc, &argv ));
+-     DFBCHECK(DirectFBSetOption ("quiet", ""));
++     DFBCHECK(DirectFBSetOption ("quiet", NULL));
+ 
+      /* create the super interface */
+      DFBCHECK(DirectFBCreate( &dfb ));
