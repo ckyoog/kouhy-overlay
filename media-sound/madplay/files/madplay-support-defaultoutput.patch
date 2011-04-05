@@ -1,0 +1,28 @@
+diff -ru madplay-0.15.2b/audio.c madplay-0.15.2b.new//audio.c
+--- madplay-0.15.2b/audio.c	2004-01-23 17:41:31.000000000 +0800
++++ madplay-0.15.2b.new//audio.c	2010-11-09 14:43:39.000000000 +0800
+@@ -54,6 +54,7 @@
+   };
+ 
+   struct map const prefixes[] = {
++    { "alsa", audio_alsa },
+     { "cdda", audio_cdda },
+     { "aiff", audio_aiff },
+     { "wave", audio_wave },
+@@ -74,6 +75,7 @@
+   };
+ 
+   struct map const extensions[] = {
++    { "alsa", audio_alsa },
+     { "cdr",  audio_cdda },
+     { "cda",  audio_cdda },
+     { "cdda", audio_cdda },
+@@ -90,7 +92,7 @@
+     { "txt",  audio_hex  }
+   };
+ 
+-  if (path == 0)
++  if (path == 0 || strcmp(*path, "default") == 0)
+     return AUDIO_DEFAULT;
+ 
+   /* check for prefix specifier */
