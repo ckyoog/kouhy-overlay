@@ -6,6 +6,8 @@ inherit eutils
 
 DESCRIPTION="remove #ifdef'ed lines from a file while otherwise leaving the file alone"
 HOMEPAGE="http://freshmeat.net/projects/unifdef/
+		  http://dotat.at/prog/unifdef/
+		  https://github.com/fanf2/unifdef
 		  http://www.freebsd.org/cgi/cvsweb.cgi/src/usr.bin/unifdef/"
 SRC_URI="mirror://gentoo/${P}.tar.lzma"
 

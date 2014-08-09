@@ -8,7 +8,7 @@ HOMEPAGE="http://blog.donews.com/gradetwo/category/137031.aspx"
 #SRC_URI="http://www.logvinov.ru/files/dist/fetion/${MY_P}.tar.bz2"
 EGIT_REPO_URI="git://github.com/gradetwo/fetion.git"
 
-inherit git
+inherit git-2
 
 LICENSE="GPL-2"
 SLOT="0"
