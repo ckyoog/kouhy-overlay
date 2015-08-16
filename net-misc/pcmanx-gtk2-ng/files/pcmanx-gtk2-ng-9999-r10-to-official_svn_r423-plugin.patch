@@ -1,0 +1,46 @@
+diff -rNau pcmanx-gtk2-0.4.2/plugin/src/nsScriptablePeer.h pcmanx-gtk2-9999/plugin/src/nsScriptablePeer.h
+--- pcmanx-gtk2-0.4.2/plugin/src/nsScriptablePeer.h	2008-06-18 16:23:51.000000000 +0800
++++ pcmanx-gtk2-9999/plugin/src/nsScriptablePeer.h	2008-08-04 01:58:17.000000000 +0800
+@@ -47,6 +47,7 @@
+ 
+ #include "pcmanx_interface.h"
+ #include "nsIClassInfo.h"
++#include "nsIProgrammingLanguage.h"
+ 
+ class nsPluginInstance;
+ 
+diff -rNau pcmanx-gtk2-0.4.2/plugin/src/plugin.cpp pcmanx-gtk2-9999/plugin/src/plugin.cpp
+--- pcmanx-gtk2-0.4.2/plugin/src/plugin.cpp	2008-06-18 16:23:51.000000000 +0800
++++ pcmanx-gtk2-9999/plugin/src/plugin.cpp	2008-08-04 01:58:17.000000000 +0800
+@@ -83,11 +83,14 @@
+ {
+   AppConfig.SetToDefault();
+   AppConfig.Load();
++  CTelnetCon::Init();
++
+   return NPERR_NO_ERROR;
+ }
+ 
+ void NS_PluginShutdown()
+ {
++  CTelnetCon::Cleanup();
+ }
+ 
+ // get values per plugin
+@@ -180,8 +183,6 @@
+   if(aWindow == NULL)
+     return FALSE;
+ 
+-  CTelnetCon::Init();
+-
+   if (SetWindow(aWindow))
+     mInitialized = TRUE;
+ 
+@@ -300,7 +301,6 @@
+   g_source_remove( m_BlinkTimer );
+   g_source_remove( m_EverySecondTimer );
+ 
+-  CTelnetCon::Cleanup();
+   mInitialized = FALSE;
+ }
+ 

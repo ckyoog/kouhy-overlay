@@ -1,0 +1,12 @@
+--- pcmanx-gtk2-0.4.2.bak/src/view/telnetview.cpp	2008-08-04 02:32:37.000000000 +0800
++++ pcmanx-gtk2-0.4.2/src/view/telnetview.cpp	2008-08-04 02:31:27.000000000 +0800
+@@ -30,6 +30,9 @@
+ #include <stdlib.h>
+ #include <time.h>
+ 
++#include <algorithm>
++using namespace std;
++
+ #include "telnetview.h"
+ #include "telnetcon.h"
+ 

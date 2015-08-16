@@ -1,0 +1,203 @@
+diff -ru xf86-video-intel-2.8.1/src/ch7017/ch7017.c xf86-video-intel-2.8.1.new//src/ch7017/ch7017.c
+--- xf86-video-intel-2.8.1/src/ch7017/ch7017.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/ch7017/ch7017.c	2010-08-24 09:39:51.000000000 +0800
+@@ -34,7 +34,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "miscstruct.h"
+ #include "xf86i2c.h"
+diff -ru xf86-video-intel-2.8.1/src/ch7xxx/ch7xxx.c xf86-video-intel-2.8.1.new//src/ch7xxx/ch7xxx.c
+--- xf86-video-intel-2.8.1/src/ch7xxx/ch7xxx.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/ch7xxx/ch7xxx.c	2010-08-24 09:39:51.000000000 +0800
+@@ -34,7 +34,7 @@
+ #include <string.h>
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "miscstruct.h"
+ #include "xf86i2c.h"
+diff -ru xf86-video-intel-2.8.1/src/i810_driver.c xf86-video-intel-2.8.1.new//src/i810_driver.c
+--- xf86-video-intel-2.8.1/src/i810_driver.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i810_driver.c	2010-08-24 09:52:25.000000000 +0800
+@@ -55,8 +55,8 @@
+  */
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
+-#include "xf86RAC.h"
++//#include "xf86Resources.h"
++//#include "xf86RAC.h"
+ #include "xf86cmap.h"
+ #include "compiler.h"
+ #include "mibstore.h"
+@@ -549,9 +549,9 @@
+ 
+    pI810->PciInfo = xf86GetPciInfoForEntity(pI810->pEnt->index);
+ 
+-   if (xf86RegisterResources(pI810->pEnt->index, NULL, ResNone))
+-      return FALSE;
+-   pScrn->racMemFlags = RAC_FB | RAC_COLORMAP;
++   //if (xf86RegisterResources(pI810->pEnt->index, NULL, ResNone))
++   //   return FALSE;
++   //pScrn->racMemFlags = RAC_FB | RAC_COLORMAP;
+ 
+    /* Set pScrn->monitor */
+    pScrn->monitor = pScrn->confScreen->monitor;
+@@ -937,8 +937,8 @@
+ 
+    /*  We won't be using the VGA access after the probe */
+    I810SetMMIOAccess(pI810);
+-   xf86SetOperatingState(resVgaIo, pI810->pEnt->index, ResUnusedOpr);
+-   xf86SetOperatingState(resVgaMem, pI810->pEnt->index, ResDisableOpr);
++   //xf86SetOperatingState(resVgaIo, pI810->pEnt->index, ResUnusedOpr);
++   //xf86SetOperatingState(resVgaMem, pI810->pEnt->index, ResDisableOpr);
+ 
+    return TRUE;
+ }
+diff -ru xf86-video-intel-2.8.1/src/i810_hwmc.c xf86-video-intel-2.8.1.new//src/i810_hwmc.c
+--- xf86-video-intel-2.8.1/src/i810_hwmc.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i810_hwmc.c	2010-08-24 09:39:51.000000000 +0800
+@@ -41,7 +41,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "xf86PciInfo.h"
+ #include "xf86Pci.h"
+diff -ru xf86-video-intel-2.8.1/src/i810_video.c xf86-video-intel-2.8.1.new//src/i810_video.c
+--- xf86-video-intel-2.8.1/src/i810_video.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i810_video.c	2010-08-24 09:39:51.000000000 +0800
+@@ -41,7 +41,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "xf86PciInfo.h"
+ #include "xf86Pci.h"
+diff -ru xf86-video-intel-2.8.1/src/i830_driver.c xf86-video-intel-2.8.1.new//src/i830_driver.c
+--- xf86-video-intel-2.8.1/src/i830_driver.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i830_driver.c	2010-08-24 09:55:37.000000000 +0800
+@@ -51,8 +51,8 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
+-#include "xf86RAC.h"
++//#include "xf86Resources.h"
++//#include "xf86RAC.h"
+ #include "xf86Priv.h"
+ #include "xf86cmap.h"
+ #include "compiler.h"
+@@ -1541,12 +1541,12 @@
+        xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "Failed to become DRM master.\n");
+ 
+ 
+-   if (xf86RegisterResources(pI830->pEnt->index, NULL, ResNone)) {
+-      PreInitCleanup(pScrn);
+-      return FALSE;
+-   }
++   //if (xf86RegisterResources(pI830->pEnt->index, NULL, ResNone)) {
++   //   PreInitCleanup(pScrn);
++   //   return FALSE;
++   //}
+ 
+-   pScrn->racMemFlags = RAC_FB | RAC_COLORMAP;
++   //pScrn->racMemFlags = RAC_FB | RAC_COLORMAP;
+    pScrn->monitor = pScrn->confScreen->monitor;
+    pScrn->progClock = TRUE;
+    pScrn->rgbBits = 8;
+@@ -1632,8 +1632,8 @@
+ 
+        /*  We won't be using the VGA access after the probe. */
+        I830SetMMIOAccess(pI830);
+-       xf86SetOperatingState(resVgaIo, pI830->pEnt->index, ResUnusedOpr);
+-       xf86SetOperatingState(resVgaMem, pI830->pEnt->index, ResDisableOpr);
++       //xf86SetOperatingState(resVgaIo, pI830->pEnt->index, ResUnusedOpr);
++       //xf86SetOperatingState(resVgaMem, pI830->pEnt->index, ResDisableOpr);
+    }
+ 
+    /* Load the dri2 module if requested. */
+diff -ru xf86-video-intel-2.8.1/src/i830_i2c.c xf86-video-intel-2.8.1.new//src/i830_i2c.c
+--- xf86-video-intel-2.8.1/src/i830_i2c.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i830_i2c.c	2010-08-24 09:56:02.000000000 +0800
+@@ -31,8 +31,8 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
+-#include "xf86RAC.h"
++//#include "xf86Resources.h"
++//#include "xf86RAC.h"
+ #include "xf86cmap.h"
+ #include "compiler.h"
+ #include "mibstore.h"
+diff -ru xf86-video-intel-2.8.1/src/i830_video.c xf86-video-intel-2.8.1.new//src/i830_video.c
+--- xf86-video-intel-2.8.1/src/i830_video.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i830_video.c	2010-08-24 09:39:51.000000000 +0800
+@@ -56,7 +56,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "xf86PciInfo.h"
+ #include "xf86Pci.h"
+diff -ru xf86-video-intel-2.8.1/src/i915_hwmc.c xf86-video-intel-2.8.1.new//src/i915_hwmc.c
+--- xf86-video-intel-2.8.1/src/i915_hwmc.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/i915_hwmc.c	2010-08-24 09:39:51.000000000 +0800
+@@ -32,7 +32,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "xf86PciInfo.h"
+ #include "xf86Pci.h"
+diff -ru xf86-video-intel-2.8.1/src/ivch/ivch.c xf86-video-intel-2.8.1.new//src/ivch/ivch.c
+--- xf86-video-intel-2.8.1/src/ivch/ivch.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/ivch/ivch.c	2010-08-24 09:39:51.000000000 +0800
+@@ -31,7 +31,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "miscstruct.h"
+ #include "xf86i2c.h"
+diff -ru xf86-video-intel-2.8.1/src/sil164/sil164.c xf86-video-intel-2.8.1.new//src/sil164/sil164.c
+--- xf86-video-intel-2.8.1/src/sil164/sil164.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/sil164/sil164.c	2010-08-24 09:39:51.000000000 +0800
+@@ -35,7 +35,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "miscstruct.h"
+ #include "xf86i2c.h"
+diff -ru xf86-video-intel-2.8.1/src/tfp410/tfp410.c xf86-video-intel-2.8.1.new//src/tfp410/tfp410.c
+--- xf86-video-intel-2.8.1/src/tfp410/tfp410.c	2009-08-14 04:07:07.000000000 +0800
++++ xf86-video-intel-2.8.1.new//src/tfp410/tfp410.c	2010-08-24 09:39:51.000000000 +0800
+@@ -34,7 +34,7 @@
+ 
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
+-#include "xf86Resources.h"
++//#include "xf86Resources.h"
+ #include "compiler.h"
+ #include "miscstruct.h"
+ #include "xf86i2c.h"

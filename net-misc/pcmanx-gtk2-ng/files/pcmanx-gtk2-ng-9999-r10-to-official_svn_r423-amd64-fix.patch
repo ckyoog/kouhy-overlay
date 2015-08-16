@@ -1,0 +1,15 @@
+--- pcmanx-gtk2-0.4.2-origin/src/mainframe.cpp	2008-06-27 16:41:27.000000000 +0800
++++ pcmanx-gtk2-0.4.2/src/mainframe.cpp	2008-08-04 10:32:23.000000000 +0800
+@@ -1655,10 +1655,10 @@
+ 
+ int CMainFrame::GetViewIndex(CTermView* view)
+ {
+-	DEBUG( "get view index, view = %x", (unsigned int) view );
++	DEBUG( "get view index, view = 0x%lx", (unsigned long) view );
+ 	if( !view )
+ 		return -1;
+-	DEBUG( "view->m_Widget = %x", (unsigned int) view->m_Widget );
++	DEBUG( "view->m_Widget = 0x%lx", (unsigned long) view->m_Widget );
+ 	return gtk_notebook_page_num( GTK_NOTEBOOK(m_pNotebook->m_Widget), view->m_Widget );
+ }
+ 

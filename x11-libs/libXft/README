@@ -1,0 +1,4 @@
+The reason why duplicate this version in custom repository is I like the xft font supplied by this version of libXft.
+
+I use xft with urxvt(rxvt-unicode) as following:
+Rxvt.font: xft:Bitstream Vera Sans Mono:pixelsize=15

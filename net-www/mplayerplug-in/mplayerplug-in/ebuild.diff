@@ -1,0 +1,25 @@
+--- mplayerplug-in-3.50.ebuild.old	2008-06-12 20:36:52.000000000 +0200
++++ mplayerplug-in-3.50.ebuild	2008-06-13 16:12:59.600196944 +0200
+@@ -16,7 +16,7 @@
+ LANGS="cs da de en_US es fr hu it ja ko nb nl pl pt_BR ru sk se tr wa zh_CN"
+ for X in ${LANGS}; do IUSE="${IUSE} linguas_${X}"; done
+ 
+-RDEPEND="xulrunner? ( =net-libs/xulrunner-1.8* )
++RDEPEND="xulrunner? ( net-libs/xulrunner )
+ 		!xulrunner? ( firefox? ( =www-client/mozilla-firefox-2* ) )
+ 		!xulrunner? ( !firefox? ( seamonkey? ( =www-client/seamonkey-1* ) ) )
+ 		x11-libs/libXpm
+@@ -52,7 +52,12 @@
+ 	if use mplayer-bin; then
+ 		epatch "${FILESDIR}/${PN}-mplayer-bin.patch"
+ 	fi
+-	epatch "${FILESDIR}/${PN}_xulrunner-1.9.patch"
++	### Let it compile against net-libs/xulrunner-1.9
++	if use xulrunner && has_version =net-libs/xulrunner-1.9* ; then
++		epatch "${FILESDIR}/${PN}-against-xulrunner-1.9.patch"
++	else
++		epatch "${FILESDIR}/${PN}_xulrunner-1.9.patch"
++	fi
+ 	epatch "${FILESDIR}/${P}-seamonkey.patch"
+ 	eautoconf
+ }

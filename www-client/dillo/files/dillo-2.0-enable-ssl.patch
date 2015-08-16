@@ -1,0 +1,11 @@
+--- dillo-2.0.origin/dpi/https.c	2009-01-25 12:41:54.000000000 +0800
++++ dillo-2.0/dpi/https.c	2009-01-25 12:27:56.000000000 +0800
+@@ -69,7 +69,7 @@
+ 
+ 
+ #define ENABLE_SSL
+-#undef ENABLE_SSL
++//#undef ENABLE_SSL
+ #ifdef ENABLE_SSL
+ 
+ #include <openssl/ssl.h>

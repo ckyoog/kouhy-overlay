@@ -1,0 +1,99 @@
+diff -ru zhcon-0.2.5.bak/src/basefont.cpp zhcon-0.2.5/src/basefont.cpp
+--- zhcon-0.2.5.bak/src/basefont.cpp	2006-04-25 00:38:27.000000000 +0800
++++ zhcon-0.2.5/src/basefont.cpp	2008-08-02 17:18:01.000000000 +0800
+@@ -16,6 +16,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#include <string.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/types.h>
+diff -ru zhcon-0.2.5.bak/src/display/fblinear4.cpp zhcon-0.2.5/src/display/fblinear4.cpp
+--- zhcon-0.2.5.bak/src/display/fblinear4.cpp	2006-04-25 00:38:23.000000000 +0800
++++ zhcon-0.2.5/src/display/fblinear4.cpp	2008-08-02 17:17:22.000000000 +0800
+@@ -17,6 +17,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#include <string.h>
+ #include <assert.h>
+ #include <endian.h>
+ #include "global.h"
+diff -ru zhcon-0.2.5.bak/src/display/fblinear8.cpp zhcon-0.2.5/src/display/fblinear8.cpp
+--- zhcon-0.2.5.bak/src/display/fblinear8.cpp	2006-04-25 00:38:23.000000000 +0800
++++ zhcon-0.2.5/src/display/fblinear8.cpp	2008-08-02 17:17:43.000000000 +0800
+@@ -17,6 +17,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#include <string.h>
+ #include <assert.h>
+ #include <endian.h>
+ #include "global.h"
+diff -ru zhcon-0.2.5.bak/src/graphdev.cpp zhcon-0.2.5/src/graphdev.cpp
+--- zhcon-0.2.5.bak/src/graphdev.cpp	2006-04-25 00:38:26.000000000 +0800
++++ zhcon-0.2.5/src/graphdev.cpp	2008-08-02 17:18:24.000000000 +0800
+@@ -20,6 +20,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+diff -ru zhcon-0.2.5.bak/src/inputclient.cpp zhcon-0.2.5/src/inputclient.cpp
+--- zhcon-0.2.5.bak/src/inputclient.cpp	2006-04-25 00:38:27.000000000 +0800
++++ zhcon-0.2.5/src/inputclient.cpp	2008-08-02 17:20:25.000000000 +0800
+@@ -16,6 +16,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#include <stdlib.h>
+ #include "inputclient.h"
+ 
+ Console* InputClient::mpCon = NULL;
+diff -ru zhcon-0.2.5.bak/src/inputmanager.cpp zhcon-0.2.5/src/inputmanager.cpp
+--- zhcon-0.2.5.bak/src/inputmanager.cpp	2008-08-02 17:15:28.000000000 +0800
++++ zhcon-0.2.5/src/inputmanager.cpp	2008-08-02 17:20:58.000000000 +0800
+@@ -21,6 +21,7 @@
+ 
+ using namespace std;
+ 
++#include <stdlib.h>
+ #include <unistd.h>
+ #include <sys/time.h>
+ #include <string>
+diff -ru zhcon-0.2.5.bak/src/inputmanager.h zhcon-0.2.5/src/inputmanager.h
+--- zhcon-0.2.5.bak/src/inputmanager.h	2006-04-25 00:38:26.000000000 +0800
++++ zhcon-0.2.5/src/inputmanager.h	2008-08-02 17:19:59.000000000 +0800
+@@ -26,6 +26,7 @@
+ using namespace std;
+ #include <cassert>
+ #include <vector>
++#include <sys/types.h>
+ 
+ #include "mouse.h"
+ #if defined(__FreeBSD__)
+diff -ru zhcon-0.2.5.bak/src/window.cpp zhcon-0.2.5/src/window.cpp
+--- zhcon-0.2.5.bak/src/window.cpp	2006-04-25 00:38:25.000000000 +0800
++++ zhcon-0.2.5/src/window.cpp	2008-08-02 17:18:46.000000000 +0800
+@@ -16,6 +16,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#include <string.h>
+ #include <cassert>
+ #include <algorithm>
+ #include <sys/time.h>
+diff -ru zhcon-0.2.5.bak/src/zhcon.cpp zhcon-0.2.5/src/zhcon.cpp
+--- zhcon-0.2.5.bak/src/zhcon.cpp	2008-08-02 17:15:28.000000000 +0800
++++ zhcon-0.2.5/src/zhcon.cpp	2008-08-02 17:19:12.000000000 +0800
+@@ -19,6 +19,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ #include <iostream>
+ #include <unistd.h>
+ #include <cstdlib>

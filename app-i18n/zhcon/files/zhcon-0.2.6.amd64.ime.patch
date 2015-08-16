@@ -1,0 +1,101 @@
+diff -ru zhcon-0.2.5-patched_all_by_ebuild_unpack.bak/src/inputmanager.cpp zhcon-0.2.5-patched_all_by_ebuild_unpack/src/inputmanager.cpp
+--- zhcon-0.2.5-patched_all_by_ebuild_unpack.bak/src/inputmanager.cpp	2008-03-08 19:04:14.000000000 +0800
++++ zhcon-0.2.5-patched_all_by_ebuild_unpack/src/inputmanager.cpp	2008-03-10 21:19:56.000000000 +0800
+@@ -205,7 +206,7 @@
+         return ;
+     }
+ 
+-    if (ProcessInputKey(c)) // is sys keyb
++    if (ProcessInputKey(c)) // is input keyb
+         return ;
+ 
+     if (mpInputClient->Visible() && mpInputServer) {
+@@ -308,6 +309,7 @@
+ //return false:no sys-key found!
+ bool InputManager::ProcessInputKey(char c) {
+     bool r = true;
++    //printf ("c=%x\n", c);
+     switch (c) {
+         case CTRL_ALT_0:
+             PromptMode();
+@@ -331,6 +333,7 @@
+             //break;
+         case CTRL_SPACE:
+         case 0: // CTRL_SPACE under GGI-X
++        case 195:
+             DoCtrlSpace();
+             break;
+         case CTRL_SHIFT:
+diff -ru zhcon-0.2.5-patched_all_by_ebuild_unpack.bak/src/winime.cpp zhcon-0.2.5-patched_all_by_ebuild_unpack/src/winime.cpp
+--- zhcon-0.2.5-patched_all_by_ebuild_unpack.bak/src/winime.cpp	2008-03-08 19:04:14.000000000 +0800
++++ zhcon-0.2.5-patched_all_by_ebuild_unpack/src/winime.cpp	2008-03-10 11:32:46.000000000 +0800
+@@ -56,10 +56,10 @@
+ 
+     memcpy(&mHead, mpBuf, sizeof(mHead));
+     int len = strlen(mHead.mCodeSet);
+-    mpIndex1 = (char **) (mpBuf + sizeof(mHead));
+-    mpIndex2 = (char **) (mpBuf + sizeof(mHead) + len * sizeof(char *));
+-    mpText = mpBuf + sizeof(mHead) + len * sizeof(char *) +
+-                len * len * sizeof(char *);
++    mpIndex1 = (int *) (mpBuf + sizeof(mHead));
++    mpIndex2 = (int *) (mpBuf + sizeof(mHead) + len * sizeof(int));
++    mpText = mpBuf + sizeof(mHead) + len * sizeof(int) +
++                len * len * sizeof(int);
+ }
+ 
+ WinIme::~WinIme() {
+@@ -246,32 +246,32 @@
+             //                p = *t;
+         }
+         else
+-            p = mpIndex1[Index(c)];
++            p = (char *) mpIndex1[Index(c)];
+ 
+         if (p == (char *) 0xffffffff)
+             found = false;
+-        p = (unsigned int) p + mpText;
++        p = (unsigned long) p + mpText;
+     } //2nd level index
+     else if (mNum == 1) {
+         int l = strlen(mHead.mCodeSet);
+         if (c == mHead.mWildChar) {
+-            char **t;
++            int *t;
+             t =
+                 find_if(mpIndex2 + Index(mInput[0]) * l,
+                         mpIndex2 + (Index(mInput[0]) + 1) * l,
+-                        bind2nd(not_equal_to < char *>(),
+-                                (char *) 0xffffffff));
++                        bind2nd(not_equal_to < int >(),
++                                (int) 0xffffffff));
+             if (t == mpIndex2 + (Index(mInput[0]) + 1) * l)
+                 p = (char *) 0xffffffff;
+             else
+-                p = *t;
++                p = (char *) *t;
+         } else
+-            p = mpIndex2[Index(mInput[0]) * l + Index(c)];
++            p = (char *) mpIndex2[Index(mInput[0]) * l + Index(c)];
+ 
+         if (p == (char *) 0xffffffff)
+             found = false;
+ 
+-        p = (unsigned int) p + mpText;
++        p = (unsigned long) p + mpText;
+     } else if (mNum < mHead.mMaxCodes) {
+         p = mpOffset[mNum - 1];
+         if (p == (char *) 0xffffffff)
+diff -ru zhcon-0.2.5-patched_all_by_ebuild_unpack.bak/src/winime.h zhcon-0.2.5-patched_all_by_ebuild_unpack/src/winime.h
+--- zhcon-0.2.5-patched_all_by_ebuild_unpack.bak/src/winime.h	2008-03-08 19:04:14.000000000 +0800
++++ zhcon-0.2.5-patched_all_by_ebuild_unpack/src/winime.h	2008-03-10 10:54:09.000000000 +0800
+@@ -83,8 +83,8 @@
+         char* mpOffset[12];
+         int mFd;
+         char* mpBuf;
+-        char** mpIndex1;
+-        char** mpIndex2;
++        int* mpIndex1;
++        int* mpIndex2;
+         char* mpText;
+         char* mpCur;                  //current search position
+         unsigned int mBufSize;

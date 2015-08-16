@@ -1,0 +1,318 @@
+diff -ru pcmanx-gtk2-svn-r464.bak/configure.ac pcmanx-gtk2-svn-r464/configure.ac
+--- pcmanx-gtk2-svn-r464.bak/configure.ac	2009-03-18 11:44:14.000000000 +0800
++++ pcmanx-gtk2-svn-r464/configure.ac	2009-03-18 14:55:02.000000000 +0800
+@@ -159,6 +159,11 @@
+ 		[enable IP location lookup. For Simplified Chinese users. Need qqwry.dat. (default: no)]),
+ 	iplookup=$enableval, iplookup="no")
+ 
++AC_ARG_ENABLE([imageview],
++	AS_HELP_STRING([--enable-imageview],
++		[enable external image viewer. (default: no)]),
++	imageview=$enableval, imageview="no")
++
+ AC_ARG_ENABLE([proxy],
+ 	AS_HELP_STRING([--enable-proxy],
+ 		[enable proxy support (default: no)]),
+@@ -382,6 +387,17 @@
+ AC_SUBST(USE_IPLOOKUP)
+ 
+ dnl *********************************************************************
++dnl ** imageview support ***********************************
++dnl *********************************************************************
++
++if test "$imageview" = "yes"; then                                                         
++    AC_DEFINE_UNQUOTED(USE_IMAGEVIEW, [1], [Enable external image viewer])
++fi
++
++AM_CONDITIONAL(USE_IMAGEVIEW, test "$imageview" = "yes")
++AC_SUBST(USE_IMAGEVIEW)
++
++dnl *********************************************************************
+ dnl ** proxy support ***********************************
+ dnl *********************************************************************
+ 
+@@ -818,6 +834,7 @@
+ fi
+ echo wget support..................... : $wget
+ echo iplookup support................. : $iplookup
++echo image viewer support............. : $imageview
+ echo proxy support.................... : $proxy
+ echo
+ echo The binary will be installed in $prefix/bin
+diff -ru pcmanx-gtk2-svn-r464.bak/src/appconfig.cpp pcmanx-gtk2-svn-r464/src/appconfig.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/appconfig.cpp	2009-03-18 11:44:12.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/appconfig.cpp	2009-03-18 14:51:36.000000000 +0800
+@@ -101,6 +101,9 @@
+ #endif
+ 		CFG_STR ( WebBrowser )
+ 		CFG_STR ( MailClient )
++#ifdef USE_IMAGEVIEW
++		CFG_STR ( ImageViewer )
++#endif
+ 		CFG_BOOL( PopupNotifier )
+ 		CFG_INT ( PopupTimeout )
+ 	END_CONFIG_SECT()
+@@ -369,6 +372,10 @@
+ 	VerticalCenterAlign = false;
+ 
+ 	MailClient = WebBrowser = "firefox %s";
++#ifdef USE_IMAGEVIEW
++	ImageViewer = "eog %s";
++#endif
++
+ #ifdef USE_DOCKLET
+ 	ShowTrayIcon = true;
+ #endif
+@@ -388,6 +395,10 @@
+ 		WebBrowser += " %s";
+ 	if(	!MailClient.empty() && !strstr( MailClient.c_str(), " %s") )
+ 		MailClient += " %s";
++#ifdef USE_IMAGEVIEW
++	if(	!ImageViewer.empty() && !strstr( ImageViewer.c_str(), " %s") )
++		ImageViewer += " %s";
++#endif
+ 
+ /*	if( 0 == Shadow.length() )
+ 		return;
+diff -ru pcmanx-gtk2-svn-r464.bak/src/appconfig.h pcmanx-gtk2-svn-r464/src/appconfig.h
+--- pcmanx-gtk2-svn-r464.bak/src/appconfig.h	2009-03-18 11:44:12.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/appconfig.h	2009-03-18 14:51:36.000000000 +0800
+@@ -128,6 +128,11 @@
+ 	vector<CSite> Favorites;
+     string WebBrowser;
+ 	string MailClient;
++		
++#ifdef USE_IMAGEVIEW
++	string ImageViewer;
++#endif
++
+     int SocketTimeout;
+ 
+ // protected:
+diff -ru pcmanx-gtk2-svn-r464.bak/src/core/site.cpp pcmanx-gtk2-svn-r464/src/core/site.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/core/site.cpp	2009-03-18 11:44:08.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/core/site.cpp	2009-03-18 14:51:36.000000000 +0800
+@@ -48,7 +48,7 @@
+ 	m_AntiIdle = 180;	// 0 means disabled
+ 
+ 	// Site Encoding
+-	m_Encoding = "Big5";
++	m_Encoding = "GBK";
+ 
+ 	// Terminal settings
+ 	// Rows per page
+diff -ru pcmanx-gtk2-svn-r464.bak/src/generalprefpage.cpp pcmanx-gtk2-svn-r464/src/generalprefpage.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/generalprefpage.cpp	2009-03-18 11:44:12.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/generalprefpage.cpp	2009-03-18 14:51:36.000000000 +0800
+@@ -39,6 +39,10 @@
+ 	GtkWidget *label29;
+ 	GtkWidget *hbox21;
+ 	GtkWidget *label30;
++#ifdef USE_IMAGEVIEW
++	GtkWidget *hboxImage;
++	GtkWidget *labelImage;
++#endif
+ 
+ 	m_QueryOnCloseCon = gtk_check_button_new_with_mnemonic (_("Confirm before closing connected connections"));
+ 	gtk_widget_show (m_QueryOnCloseCon);
+@@ -118,6 +122,20 @@
+ 	gtk_widget_show (m_MailClient);
+  	gtk_box_pack_start (GTK_BOX (hbox21), m_MailClient, TRUE, TRUE, 0);
+ 
++#ifdef USE_IMAGEVIEW
++	hboxImage = gtk_hbox_new (FALSE, 0);
++	gtk_widget_show (hboxImage);
++	gtk_box_pack_start (GTK_BOX (m_Widget), hboxImage, FALSE, FALSE, 0);
++
++	labelImage = gtk_label_new (_("Image Viewer: "));
++	gtk_widget_show (labelImage);
++	gtk_box_pack_start (GTK_BOX (hboxImage), labelImage, FALSE, FALSE, 0);
++
++	m_ImageViewer = gtk_entry_new ();
++	gtk_widget_show (m_ImageViewer);
++	gtk_box_pack_start (GTK_BOX (hboxImage), m_ImageViewer, TRUE, TRUE, 0);
++#endif
++
+ 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_QueryOnCloseCon), AppConfig.QueryOnCloseCon);
+ 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_QueryOnExit), AppConfig.QueryOnExit);
+ 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_CancelSelAfterCopy), AppConfig.CancelSelAfterCopy);
+@@ -138,6 +156,9 @@
+ 
+ 	gtk_entry_set_text(GTK_ENTRY(m_WebBrowser), AppConfig.WebBrowser.c_str());
+ 	gtk_entry_set_text(GTK_ENTRY(m_MailClient), AppConfig.MailClient.c_str());
++#ifdef USE_IMAGEVIEW
++	gtk_entry_set_text(GTK_ENTRY(m_ImageViewer), AppConfig.ImageViewer.c_str());
++#endif
+ }
+ 
+ 
+@@ -161,4 +182,7 @@
+ 	AppConfig.PopupTimeout = (int)gtk_spin_button_get_value( GTK_SPIN_BUTTON(m_PopupTimeout));
+ 	AppConfig.WebBrowser = gtk_entry_get_text(GTK_ENTRY(m_WebBrowser));
+ 	AppConfig.MailClient = gtk_entry_get_text(GTK_ENTRY(m_MailClient));
++#ifdef USE_IMAGEVIEW
++	AppConfig.ImageViewer = gtk_entry_get_text(GTK_ENTRY(m_ImageViewer));;
++#endif
+ }
+diff -ru pcmanx-gtk2-svn-r464.bak/src/generalprefpage.h pcmanx-gtk2-svn-r464/src/generalprefpage.h
+--- pcmanx-gtk2-svn-r464.bak/src/generalprefpage.h	2009-03-18 11:44:12.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/generalprefpage.h	2009-03-18 14:51:36.000000000 +0800
+@@ -46,6 +46,9 @@
+ 	GtkWidget *m_ShowStatusBar;
+ 	GtkWidget *m_WebBrowser;
+ 	GtkWidget *m_MailClient;
++#ifdef USE_IMAGEVIEW		
++	GtkWidget *m_ImageViewer;
++#endif
+ 	GtkWidget *m_AAFont;
+ 	GtkWidget *m_PopupNotifier;
+ 	GtkWidget *m_PopupTimeout;
+diff -ru pcmanx-gtk2-svn-r464.bak/src/mainframe.cpp pcmanx-gtk2-svn-r464/src/mainframe.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/mainframe.cpp	2009-03-18 11:44:12.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/mainframe.cpp	2009-03-18 14:51:36.000000000 +0800
+@@ -227,13 +227,18 @@
+ 	if (AppConfig.ShowStatusBar) {
+ 		gtk_widget_show_all(m_Statusbar);
+ 	}
+-	
++
+ 	m_BlinkTimer = g_timeout_add(600, (GSourceFunc)CMainFrame::OnBlinkTimer, this );
+ 	m_EverySecondTimer = g_timeout_add(1000, (GSourceFunc)CMainFrame::OnEverySecondTimer, this );
+ 
+ 	CTelnetView::SetParentFrame(this);
+ 	CTelnetView::SetWebBrowser(AppConfig.WebBrowser);
+ 	CTelnetView::SetMailClient(AppConfig.MailClient);
++#ifdef USE_IMAGEVIEW
++	CTelnetView::SetImageViewer (AppConfig.ImageViewer);
++#endif
++
++
+ #ifdef USE_WGET
+ 	CTelnetView::setWgetFiles(AppConfig.UseWgetFiles);
+ #endif
+@@ -990,6 +995,11 @@
+ 
+ 	CTelnetView::SetWebBrowser(AppConfig.WebBrowser);
+ 	CTelnetView::SetMailClient(AppConfig.MailClient);
++#ifdef USE_IMAGEVIEW
++	CTelnetView::SetImageViewer (AppConfig.ImageViewer);
++#endif
++
++
+ #ifdef USE_WGET
+ 	CTelnetView::setWgetFiles(AppConfig.UseWgetFiles);
+ #endif
+diff -ru pcmanx-gtk2-svn-r464.bak/src/view/telnetview.cpp pcmanx-gtk2-svn-r464/src/view/telnetview.cpp
+--- pcmanx-gtk2-svn-r464.bak/src/view/telnetview.cpp	2009-03-18 11:44:10.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/view/telnetview.cpp	2009-03-18 15:00:37.000000000 +0800
+@@ -58,6 +58,11 @@
+ 
+ string CTelnetView::m_WebBrowser;
+ string CTelnetView::m_MailClient;
++
++#ifdef USE_IMAGEVIEW
++string CTelnetView::m_ImageViewer;
++#endif
++
+ #ifdef USE_WGET
+ bool CTelnetView::m_bWgetFiles = false;
+ #endif
+@@ -703,6 +708,28 @@
+ 	}
+ }
+ 
++#ifdef USE_IMAGEVIEW
++static void thr_downimage(gpointer *arg)
++{
++	string* value = (string *) arg;
++	string url = value->substr(0,value->find("#"));
++	string app = value->substr(value->find("#") + 1, value->length());
++	char *tmp_img;
++	char tmpname[L_tmpnam];
++	tmp_img = tmpnam(tmpname);
++
++	char cmd[200];
++	sprintf(cmd, "wget %s -O%s", url.c_str(), tmp_img);
++	system(cmd);
++	char cmd1[100];
++
++	sprintf(cmd1, app.c_str(), tmp_img);
++	strcat(cmd1, " &");
++	system(cmd1);
++	return;
++}
++#endif
++
+ void CTelnetView::OnHyperlinkClicked(string sURL)
+ {
+ #ifdef USE_WGET
+@@ -753,12 +780,32 @@
+ 		if( strncmpi( sURL.c_str(), "mailto:", 7 ) )
+ 			sURL.insert( 0, "mailto:" );
+ 	}
++#ifdef USE_IMAGEVIEW
++	else if (!strncmpi(sURL.c_str() + sURL.length() - 4, "jpg", 3) ||
++		 !strncmpi(sURL.c_str() + sURL.length() - 4, "gif", 3) ||
++	         !strncmpi(sURL.c_str() + sURL.length() - 4, "bmp", 3) ||
++		 !strncmpi(sURL.c_str() + sURL.length() - 4, "png", 3))
++	{
++
++		GThread *tid = NULL;
++		string thread_arg = sURL;
++		thread_arg.append("#");
++		thread_arg.append(m_ImageViewer);
++		printf("myurl=%s\n", thread_arg.c_str());
++		tid = g_thread_create((GThreadFunc) &thr_downimage,
++		                      (gpointer *) &thread_arg,
++				      FALSE, NULL);
++		return;
++	}
++#endif
+ 	else
+ 		app = m_WebBrowser;
+ 
+ 	char *cmdline = new char[ app.length() + sURL.length() + 10 ];
+ 	if( strstr(app.c_str(), "%s") )
++	{
+ 		sprintf( cmdline, app.c_str(), sURL.c_str() );
++	}
+ 	else
+ 	{
+ 		memcpy(cmdline, app.c_str(), app.length());
+diff -ru pcmanx-gtk2-svn-r464.bak/src/view/telnetview.h pcmanx-gtk2-svn-r464/src/view/telnetview.h
+--- pcmanx-gtk2-svn-r464.bak/src/view/telnetview.h	2009-03-18 11:44:10.000000000 +0800
++++ pcmanx-gtk2-svn-r464/src/view/telnetview.h	2009-03-18 14:51:36.000000000 +0800
+@@ -54,15 +54,21 @@
+ 
+ 	static void SetWebBrowser(string browser){	m_WebBrowser = browser;	}
+ 	static void SetMailClient(string mailclient){	m_MailClient = mailclient;	}
++#ifdef USE_IMAGEVIEW
++	static void SetImageViewer(string imageviewer){	m_ImageViewer = imageviewer;	}
++#endif
++
+ #ifdef USE_WGET
+ 	static void setWgetFiles(const bool bBool){ m_bWgetFiles = bBool; }
+ #endif
+ 
++
++
+ protected:
+     bool OnKeyDown(GdkEventKey* evt);
+ protected:
+     void OnMouseMove(GdkEventMotion* evt);
+-#if defined(USE_MOUSE) && !defined(MOZ_PLUGIN)    
++#if defined(USE_MOUSE) && !defined(MOZ_PLUGIN)
+     void OnMouseScroll(GdkEventScroll* evt);
+     void OnLButtonUp(GdkEventButton* evt);
+ #endif // defined(USE_MOUSE) && !defined(MOZ_PLUGIN)
+@@ -80,6 +86,10 @@
+ #endif /* !defined(MOZ_PLUGIN) */
+     static string m_WebBrowser;
+     static string m_MailClient;
++#ifdef USE_IMAGEVIEW
++	static string m_ImageViewer;
++#endif
++
+ #ifdef USE_WGET
+ 	static bool m_bWgetFiles;
+ #endif

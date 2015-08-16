@@ -1,0 +1,29 @@
+--- mplayerplug-in-3.50.ebuild	2008-08-12 23:22:10.000000000 +0200
++++ mplayerplug-in-3.55.ebuild	2008-08-12 23:47:45.000000000 +0200
+@@ -38,16 +38,13 @@
+ 				)
+ 		)"
+ 
+-S=${WORKDIR}/${PN}
+-
+ src_unpack() {
+ 	unpack ${A}
+ 	cd "${S}"
+ 	epatch "${FILESDIR}/${PN}-3.40-cflags.patch"
+-	epatch "${FILESDIR}/${PN}-gcc4.patch"
+-	epatch "${FILESDIR}/${PN}_xulrunner-1.9.patch"
+-	epatch "${FILESDIR}/${P}-seamonkey.patch"
+-	eautoconf
++	epatch "${FILESDIR}/${P}-gcc4.patch"
++	#epatch "${FILESDIR}/${PN}_xulrunner-1.9.patch" # not sure if it is needed
++	eautoreconf
+ }
+ 
+ src_compile() {
+@@ -146,5 +143,5 @@
+ 	insinto /etc
+ 	doins mplayerplug-in.conf
+ 
+-	dodoc ChangeLog INSTALL README DOCS/tech/*.txt
++	dodoc ChangeLog INSTALL README
+ }

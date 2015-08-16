@@ -1,0 +1,15 @@
+diff -ru mplayerplug-in-3.55.orig/Source/plugin-ui.cpp mplayerplug-in-3.55/Source/plugin-ui.cpp
+--- mplayerplug-in-3.55.orig/Source/plugin-ui.cpp	2008-08-12 23:24:42.000000000 +0200
++++ mplayerplug-in-3.55/Source/plugin-ui.cpp	2008-08-12 23:25:17.000000000 +0200
+@@ -283,11 +283,6 @@
+     int term, chop;
+     int PercentRedraw;
+ 
+-    if (0) {
+-	printf("Widget: %p\n", w);
+-	printf("Message: %s\n", message);
+-    }
+-
+     if (DEBUG > 1)
+ 	printf("state = %i, height = %i width = %i\n", instance->state,
+ 	       instance->movie_height, instance->movie_width);

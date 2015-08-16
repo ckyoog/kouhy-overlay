@@ -1,0 +1,87 @@
+diff -Naur mplayerplug-in.old/Source/nsIScriptableMplayerPlugin.h mplayerplug-in/Source/nsIScriptableMplayerPlugin.h
+--- mplayerplug-in.old/Source/nsIScriptableMplayerPlugin.h	2007-12-02 00:23:04.000000000 +0100
++++ mplayerplug-in/Source/nsIScriptableMplayerPlugin.h	2008-06-13 15:09:25.545980412 +0200
+@@ -25,7 +25,7 @@
+ class NS_NO_VTABLE nsIScriptableWMPPlugin : public nsISupports {
+  public: 
+ 
+-  NS_DEFINE_STATIC_IID_ACCESSOR(NS_ISCRIPTABLEWMPPLUGIN_IID)
++  NS_DECLARE_STATIC_IID_ACCESSOR(NS_ISCRIPTABLEWMPPLUGIN_IID)
+ 
+   /* void play (); */
+   NS_IMETHOD Play(void) = 0;
+@@ -120,7 +120,7 @@
+ class NS_NO_VTABLE nsIScriptableMplayerPlugin : public nsISupports {
+  public: 
+ 
+-  NS_DEFINE_STATIC_IID_ACCESSOR(NS_ISCRIPTABLEMPLAYERPLUGIN_IID)
++  NS_DECLARE_STATIC_IID_ACCESSOR(NS_ISCRIPTABLEMPLAYERPLUGIN_IID)
+ 
+   /* void Play (); */
+   NS_IMETHOD Play(void) = 0;
+diff -Naur mplayerplug-in.old/Source/nsScriptablePeer.cpp mplayerplug-in/Source/nsScriptablePeer.cpp
+--- mplayerplug-in.old/Source/nsScriptablePeer.cpp	2007-12-02 00:23:04.000000000 +0100
++++ mplayerplug-in/Source/nsScriptablePeer.cpp	2008-06-13 15:25:52.536375565 +0200
+@@ -98,21 +98,21 @@
+ 	return NS_ERROR_NULL_POINTER;
+ 
+     if (aIID.Equals(kIScriptableMplayerPluginIID)) {
+-	*aInstancePtr = NS_STATIC_CAST(nsIScriptableMplayerPlugin *, this);
++	*aInstancePtr = NS_ISUPPORTS_CAST(nsIScriptableMplayerPlugin *, this);
+ 	AddRef();
+ 	return NS_OK;
+     }
+ 
+     if (aIID.Equals(kIClassInfoIID)) {
+-	*aInstancePtr = NS_STATIC_CAST(nsIClassInfo *, this);
++	*aInstancePtr = NS_ISUPPORTS_CAST(nsIClassInfo *, this);
+ 	AddRef();
+ 	return NS_OK;
+     }
+ 
+     if (aIID.Equals(kISupportsIID)) {
+ 	*aInstancePtr =
+-	    NS_STATIC_CAST(nsISupports *,
+-			   (NS_STATIC_CAST
++	    NS_ISUPPORTS_CAST(nsISupports *,
++			   (NS_ISUPPORTS_CAST
+ 			    (nsIScriptableMplayerPlugin *, this)));
+ 	AddRef();
+ 	return NS_OK;
+@@ -511,21 +511,21 @@
+ 	return NS_ERROR_NULL_POINTER;
+ 
+     if (aIID.Equals(kIScriptableWMPPluginIID)) {
+-	*aInstancePtr = NS_STATIC_CAST(nsIScriptableWMPPlugin *, this);
++	*aInstancePtr = NS_ISUPPORTS_CAST(nsIScriptableWMPPlugin *, this);
+ 	AddRef();
+ 	return NS_OK;
+     }
+ 
+     if (aIID.Equals(kIClassInfoIID)) {
+-	*aInstancePtr = NS_STATIC_CAST(nsIClassInfo *, this);
++	*aInstancePtr = NS_ISUPPORTS_CAST(nsIClassInfo *, this);
+ 	AddRef();
+ 	return NS_OK;
+     }
+ 
+     if (aIID.Equals(kISupportsIID)) {
+ 	*aInstancePtr =
+-	    NS_STATIC_CAST(nsISupports *,
+-			   (NS_STATIC_CAST
++	    NS_ISUPPORTS_CAST(nsISupports *,
++			   (NS_ISUPPORTS_CAST
+ 			    (nsIScriptableWMPPlugin *, this)));
+ 	AddRef();
+ 	return NS_OK;
+diff -Naur mplayerplug-in.old/Source/nsScriptablePeer.h mplayerplug-in/Source/nsScriptablePeer.h
+--- mplayerplug-in.old/Source/nsScriptablePeer.h	2004-03-27 21:10:48.000000000 +0100
++++ mplayerplug-in/Source/nsScriptablePeer.h	2008-06-13 15:14:46.062073967 +0200
+@@ -47,6 +47,7 @@
+ 
+ #include "nsIScriptableMplayerPlugin.h"
+ #include "nsIClassInfo.h"
++#include "nsIProgrammingLanguage.h"
+ 
+ class nsPluginInstance;
+ 

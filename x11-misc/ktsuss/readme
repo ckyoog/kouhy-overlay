@@ -1,0 +1,5 @@
+# Thomas Kahle <tomka@gentoo.org> (25 Sep 2011)
+# Masked for removal in 30 days.  Unfixed security
+# issues (Bug 381115), dead upstream.
+x11-misc/ktsuss
+

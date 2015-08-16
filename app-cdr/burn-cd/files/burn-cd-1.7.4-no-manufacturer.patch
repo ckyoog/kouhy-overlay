@@ -1,0 +1,11 @@
+--- burn-cd-1.7.4.orig	2008-08-26 23:44:44.000000000 +0800
++++ burn-cd-1.7.4	2008-08-26 23:44:26.000000000 +0800
+@@ -1255,7 +1255,7 @@
+     if verbose:
+         print_key_value( 'Disk', disk_type )
+         print_key_value( 'Physical size', disk_size )
+-        if media_id:  manufacturer += '/'+media_id
++        if media_id:  manufacturer = ( manufacturer or '(n/a)' )+'/'+media_id
+         print_key_value( 'Media ID', manufacturer or 'n/a' )
+         # read speed
+         if max_rspeed:
