@@ -1,0 +1,24 @@
+--- modules/system-source/system-source.c.orig	2015-09-03 02:21:22.000000000 -0700
++++ modules/system-source/system-source.c	2015-09-03 02:22:13.000000000 -0700
+@@ -188,16 +188,16 @@
+ static void
+ system_sysblock_add_linux_kmsg(GString *sysblock)
+ {
+-  gchar *kmsg = "/proc/kmsg";
++  gchar *kmsg = "/dev/kmsg";
+   int fd;
+-  gchar *format = NULL;
++  gchar *format = "linux-kmsg";
+ 
+-  if ((fd = open("/dev/kmsg", O_RDONLY)) != -1)
++  if ((fd = open("/proc/kmsg", O_RDONLY)) != -1)
+     {
+       if ((lseek (fd, 0, SEEK_END) != -1) && _is_fd_pollable(fd))
+         {
+-          kmsg = "/dev/kmsg";
+-          format = "linux-kmsg";
++          kmsg = "/proc/kmsg";
++          format = NULL;
+         }
+       close (fd);
+     }

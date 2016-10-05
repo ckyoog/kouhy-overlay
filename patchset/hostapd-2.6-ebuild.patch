@@ -1,0 +1,10 @@
+--- hostapd-2.6.ebuild.old	2016-10-05 14:21:26.000000000 -0700
++++ hostapd-2.6.ebuild	2016-10-05 14:20:48.000000000 -0700
+@@ -30,6 +30,7 @@
+ src_prepare() {
+ 	sed -i -e "s:/etc/hostapd:/etc/hostapd/hostapd:g" \
+ 		"${S}/hostapd.conf" || die
++	default # or eapply_user. the latter is called by default. default will call default_${phase_func}.
+ }
+ 
+ src_configure() {

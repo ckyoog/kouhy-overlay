@@ -1,0 +1,68 @@
+#!/sbin/runscript
+# This file is part of Fail2Ban.
+#
+# Fail2Ban is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Fail2Ban is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Fail2Ban; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# Author: Sireyessire, Cyril Jaquier
+#
+
+extra_started_commands="reload showlog"
+
+FAIL2BAN="/usr/bin/fail2ban-client ${FAIL2BAN_OPTIONS}"
+FAIL2BAN_PIDFILE=/run/fail2ban/fail2ban.pid
+FAIL2BAN_CHECK="pgrep fail2ban-server"
+
+depend() {
+	need net
+	need logger
+	after iptables
+}
+
+start() {
+	ebegin "Starting fail2ban"
+	if [ ! -d /run/fail2ban ]; then
+		mkdir /run/fail2ban || return 1
+	fi
+	local fail2ban_sock=/run/fail2ban/fail2ban.sock
+	if [ -e $fail2ban_sock ] && netstat -xln >/dev/null && ! netstat -xln | grep "$fail2ban_sock" &>/dev/null; then
+	#if [ -e /run/fail2ban/fail2ban.sock ]; then
+		# remove stalled sock file after system crash
+		# bug 347477
+		rm -rf $fail2ban_sock || return 1
+	fi
+	start-stop-daemon --start \
+	    --pidfile "${FAIL2BAN_PIDFILE}" \
+	    -- ${FAIL2BAN} start
+	eend $? "Failed to start fail2ban"
+}
+
+stop() {
+	ebegin "Stopping fail2ban"
+	#start-stop-daemon --stop --pidfile "${FAIL2BAN_PIDFILE}"
+	if ${FAIL2BAN_CHECK} >/dev/null; then
+		${FAIL2BAN} stop &> /dev/null
+	fi
+	eend $? "Failed to stop fail2ban"
+}
+
+reload() {
+	ebegin "Reloading fail2ban"
+	${FAIL2BAN} reload
+	eend $? "Failed to reload fail2ban"
+}
+
+showlog(){
+	less /var/log/fail2ban.log
+}
