@@ -2,6 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/net-misc/directvnc/directvnc-0.7.5-r1.ebuild,v 1.2 2007/11/16 17:07:20 s4t4n Exp $
 
+EAPI=1
+
 inherit eutils
 
 DESCRIPTION="Very thin VNC client for unix framebuffer systems"
@@ -14,7 +16,7 @@ KEYWORDS="x86 ~ppc ~amd64"
 IUSE="mouse"
 
 RDEPEND="dev-libs/DirectFB
-	>=media-libs/jpeg-6b-r7"
+	virtual/jpeg:62"
 
 DEPEND="${RDEPEND}
 	dev-util/pkgconfig
