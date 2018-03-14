@@ -1,0 +1,6 @@
+tuxonice-sources-3.8.3-r1.ebuild is customized by myself (I forget when).
+
+tuxonice-sources has been last-rited, see bug https://bugs.gentoo.org/627924
+so is tuxonice-userui
+
+I make the copy for my own use here, including tuxonice-userui and the dependency lcms:0
