@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit eutils webapp depend.php
+inherit eutils webapp
 
 DESCRIPTION="Web-based administration for VirtualBox in PHP"
 HOMEPAGE="http://phpvirtualbox.googlecode.com"
@@ -16,9 +16,8 @@ IUSE=""
 
 RDEPEND="
 	dev-lang/php[session,unicode,pcre,soap,gd]
+	virtual/httpd-php
 "
-
-need_php_httpd
 
 pkg_setup() {
 	webapp_pkg_setup

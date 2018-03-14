@@ -2,16 +2,18 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/app-i18n/ibus-pinyin/ibus-pinyin-1.2.0.20090915.ebuild,v 1.5 2010/05/26 10:36:49 pacho Exp $
 
-EAPI="2"
+EAPI="4"
 PYTHON_DEPEND="2:2.5"
 PYTHON_USE_WITH="sqlite"
-inherit eutils python
+inherit eutils python-utils-r1
 
 PYDB_TAR="pinyin-database-0.1.10.6.tar.bz2"
 DESCRIPTION="Chinese PinYin IMEngine for IBus Framework"
 HOMEPAGE="http://code.google.com/p/ibus/"
 SRC_URI="http://ibus.googlecode.com/files/${P}.tar.gz
-	http://ibus.googlecode.com/files/${PYDB_TAR}"
+	http://ibus.googlecode.com/files/${PYDB_TAR}
+	https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/ibus/${PYDB_TAR}
+	https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/ibus/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"

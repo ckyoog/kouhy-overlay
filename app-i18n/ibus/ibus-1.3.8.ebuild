@@ -2,18 +2,21 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/app-i18n/ibus/ibus-1.3.8.ebuild,v 1.2 2010/11/05 14:11:27 matsuu Exp $
 
-EAPI="2"
+EAPI="4"
 PYTHON_DEPEND="python? 2:2.5"
-inherit confutils eutils gnome2-utils multilib python
+inherit eutils gnome2-utils multilib python-utils-r1
 
 DESCRIPTION="Intelligent Input Bus for Linux / Unix OS"
 HOMEPAGE="http://code.google.com/p/ibus/"
-SRC_URI="http://ibus.googlecode.com/files/${P}.tar.gz"
+SRC_URI="http://ibus.googlecode.com/files/${P}.tar.gz
+	https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PN}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="doc +gconf gtk introspection nls +python vala X"
+
+REQUIRED_USE="|| ( X gtk )"
 
 RDEPEND=">=dev-libs/glib-2.18
 	gconf? ( >=gnome-base/gconf-2.12 )
@@ -62,7 +65,6 @@ update_gtk_immodules() {
 
 pkg_setup() {
 	# bug #342903
-	confutils_require_any X gtk
 	python_set_active_version 2
 }
 
