@@ -1,0 +1,43 @@
+diff -ru pqiv-2.6.old/backends/shared-initializer.c pqiv-2.6/backends/shared-initializer.c
+--- pqiv-2.6.old/backends/shared-initializer.c	2016-07-08 03:57:13.000000000 -0700
++++ pqiv-2.6/backends/shared-initializer.c	2017-01-05 13:58:04.000000000 -0800
+@@ -10,7 +10,7 @@
+ void initialize_file_type_handlers() {
+ 	int i = 0;
+ 	for(char **backend=(char **)&available_backends[0]; *backend; backend++) {
+-		gchar *backend_candidate = g_strdup_printf("pqiv-backend-%s.so", *backend);
++		gchar *backend_candidate = g_strdup_printf(BACKENDS_DIR "pqiv-backend-%s.so", *backend);
+ 
+ 		GModule *backend_module = g_module_open(backend_candidate, G_MODULE_BIND_LOCAL);
+ 		if(backend_module) {
+diff -ru pqiv-2.6.old/GNUmakefile pqiv-2.6/GNUmakefile
+--- pqiv-2.6.old/GNUmakefile	2016-07-08 03:57:13.000000000 -0700
++++ pqiv-2.6/GNUmakefile	2017-01-05 14:06:39.000000000 -0800
+@@ -17,6 +17,7 @@
+ BACKENDS=gdkpixbuf
+ EXTRA_DEFS=
+ BACKENDS_BUILD=static
++BACKENDS_DIR=$(PREFIX)/lib/pqiv/
+ 
+ # Load config.make (created by configure)
+ ifeq ($(wildcard config.make),config.make)
+@@ -142,7 +143,7 @@
+ 
+ ifeq ($(BACKENDS_BUILD), shared)
+ backends/%.o: backends/%.c $(HEADERS)
+-	$(SILENT_CC) $(CROSS)$(CC) $(CPPFLAGS) -c -o $@ $(CFLAGS_REAL) $(BACKENDS_BUILD_CFLAGS_$*) $<
++	$(SILENT_CC) $(CROSS)$(CC) $(CPPFLAGS) -DBACKENDS_DIR='"$(BACKENDS_DIR)"' -c -o $@ $(CFLAGS_REAL) $(BACKENDS_BUILD_CFLAGS_$*) $<
+ 
+ backends/pqiv-backend-%.so: backends/%.o
+ 	$(SILENT_CCLD) $(CROSS)$(CC) -shared $(CPPFLAGS) -o $@ $+ $(LDLIBS_REAL) $(LDFLAGS_REAL) $(BACKENDS_BUILD_LDLIBS_$*)
+@@ -171,8 +172,8 @@
+ 	-mkdir -p $(DESTDIR)$(MANDIR)/man1
+ 	-install --mode=644 pqiv.1 $(DESTDIR)$(MANDIR)/man1/pqiv.1
+ ifeq ($(BACKENDS_BUILD), shared)
+-	mkdir -p $(DESTDIR)$(PREFIX)/lib/pqiv
+-	install $(SHARED_OBJECTS) $(DESTDIR)$(PREFIX)/lib/pqiv/
++	mkdir -p $(DESTDIR)$(BACKENDS_DIR)
++	install $(SHARED_OBJECTS) $(DESTDIR)$(BACKENDS_DIR)
+ endif
+ 
+ uninstall:
