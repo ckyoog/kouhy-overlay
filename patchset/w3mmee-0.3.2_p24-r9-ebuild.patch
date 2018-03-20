@@ -1,0 +1,24 @@
+--- w3mmee-0.3.2_p24-r9.ebuild.orig	2018-03-17 04:36:30.000000000 -0700
++++ w3mmee-0.3.2_p24-r9.ebuild	2018-03-17 04:44:57.000000000 -0700
+@@ -42,9 +42,10 @@
+ 		"${FILESDIR}"/${P}-tinfo.patch \
+ 		"${FILESDIR}"/${P}-boehm-gc.patch
+ 	sed -ie "/^AR=/s:ar:$(tc-getAR):" XMakefile || die
++	epatch /usr/local/portage/patchset/${P}-compile.patch	#custom added by postsync script a-temp
+ }
+ 
+-src_compile() {
++src_configure() {
+ 
+ 	local myconf myuse
+ 	myuse="use_cookie=y use_ansi_color=y use_history=y
+@@ -101,6 +102,9 @@
+ 		-mk_btri=/usr/libexec/moe \
+ 		-cflags="${CFLAGS}" -ldflags="${LDFLAGS}" \
+ 		${myconf} || die
++}
++
++src_compile() {
+ 
+ 	emake || die "emake failed"
+ }

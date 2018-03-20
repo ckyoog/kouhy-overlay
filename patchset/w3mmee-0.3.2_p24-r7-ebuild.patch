@@ -1,0 +1,10 @@
+--- w3mmee-0.3.2_p24-r7.ebuild.orig	2018-03-18 16:46:40.000000000 -0700
++++ w3mmee-0.3.2_p24-r7.ebuild	2018-03-18 16:46:29.000000000 -0700
+@@ -39,6 +39,7 @@
+ 		"${FILESDIR}"/${P}-tinfo.patch \
+ 		"${FILESDIR}"/${P}-boehm-gc.patch
+ 	sed -ie "/^AR=/s:ar:$(tc-getAR):" XMakefile || die
++	epatch /usr/local/portage/patchset/${P}-compile.patch	#custom added by postsync script a-temp
+ }
+ 
+ src_compile() {
