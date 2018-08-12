@@ -4,7 +4,8 @@
 
 EAPI=4
 
-inherit eutils toolchain-funcs qt4-r2 systemd multilib
+#inherit eutils toolchain-funcs qt4-r2 systemd multilib
+inherit eutils toolchain-funcs systemd multilib
 
 DESCRIPTION="IEEE 802.1X/WPA supplicant for secure wireless transfers"
 HOMEPAGE="http://hostap.epitest.fi/wpa_supplicant/"

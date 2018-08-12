@@ -12,6 +12,8 @@
 
 # Current this ebuild is actually for svn rev 483.
 
+EAPI=4
+
 inherit eutils flag-o-matic autotools multilib git-r3
 
 DESCRIPTION="PCMan is an easy-to-use telnet(ssh) client mainly targets BBS users formerly writen by gtk2, with patches from ng and myself(kouhy)."
